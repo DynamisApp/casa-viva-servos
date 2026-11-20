@@ -3,46 +3,66 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#161616">
+<meta name="theme-color" content="#F5F3EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1A22" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 <title>Casa Viva · Servos</title>
 <style>
-:root{--bg:#161616;--card:#222;--tx:#f2eee8;--mu:#a49c92;--ac:#4a9bff;--bd:#333;--ok:#2a9d6a;--wn:#e0a82b}
-@media (prefers-color-scheme:light){:root{--bg:#f4f1ec;--card:#fff;--tx:#1d1a17;--mu:#6b645c;--ac:#1b6fd8;--bd:#ddd6cc}}
-*{box-sizing:border-box;margin:0}
-body{background:var(--bg);color:var(--tx);font:16px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;justify-content:center;min-height:100vh;padding-top:env(safe-area-inset-top,0)}
+:root{--bg:#F5F3EE;--card:#fff;--field:#F0EEE8;--tx:#14212B;--mu:#6C7780;--ac:#176B8D;--ac2:#0F4C66;--or:#F7931D;--ok:#1F9D6B;--sh:0 10px 30px rgba(20,45,62,.08);--glass:rgba(255,255,255,.82)}
+@media (prefers-color-scheme:dark){:root{--bg:#0E1A22;--card:#16262F;--field:#1D303A;--tx:#EAF2F6;--mu:#8FA3AF;--ac:#3AA0C9;--sh:0 10px 30px rgba(0,0,0,.35);--glass:rgba(22,38,47,.85)}}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+body{background:radial-gradient(900px 420px at 50% -120px,rgba(23,107,141,.16),transparent),var(--bg);color:var(--tx);font:500 16px "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;justify-content:center;min-height:100vh;padding-top:env(safe-area-inset-top,0)}
 #app{width:100%;max-width:440px;min-height:100vh;position:relative}
-header{display:flex;align-items:center;gap:10px;padding:12px 16px}
-.av{width:38px;height:38px;border-radius:50%;background:var(--ac);color:#fff;display:grid;place-items:center;font-weight:700}
-header b{flex:1;font-size:17px}header small{display:block;color:var(--mu);font-weight:400;font-size:12px}
-main{padding:0 14px calc(100px + env(safe-area-inset-bottom,0))}
-h2{font-size:14px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin:18px 2px 8px}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:10px}
-.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.row2{display:flex;gap:8px;margin-top:10px}.row2 .btn{flex:1}
-.mu{color:var(--mu)}.sm{font-size:13px}p{margin-top:4px}
-.btn{background:var(--ac);color:#fff;border:0;border-radius:12px;padding:12px 16px;font-weight:700;font-size:15px;cursor:pointer;width:100%}
-.btn.alt{background:transparent;color:var(--ac);border:1.5px solid var(--ac)}.btn.sm{padding:8px 12px;width:auto}
-.ghost{background:none;border:0;color:var(--mu);font-size:14px;cursor:pointer;padding:6px}
-.tag{font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;background:var(--bd);color:var(--mu)}
-.tag.confirmado{background:var(--ok);color:#fff}.tag.troca_solicitada{background:var(--wn);color:#222}
-.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{background:var(--card);border:1px solid var(--bd);border-radius:999px;padding:7px 13px;font-size:14px}
-.warn{background:var(--wn);color:#222;border-radius:14px;padding:12px 14px;margin-top:6px}
-label{display:block;font-size:13px;color:var(--mu);margin-bottom:12px}
-input,select{display:block;width:100%;margin-top:5px;padding:12px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font-size:16px}
-nav{position:fixed;bottom:calc(8px + env(safe-area-inset-bottom,0));left:50%;transform:translateX(-50%);width:calc(100% - 24px);max-width:416px;display:flex;background:var(--card);border:1px solid var(--bd);border-radius:24px;padding:6px}
-nav button{flex:1;background:none;border:0;color:var(--mu);padding:8px 0;font-size:12px;font-weight:600;cursor:pointer;position:relative}
-nav button.on{color:var(--ac)}nav span{display:block;font-size:19px}
-nav i{position:absolute;top:2px;right:24%;background:#e5484d;color:#fff;border-radius:999px;font-style:normal;font-size:10px;padding:1px 6px}
-.auth{padding:34px 18px}.auth .logo{font-size:44px;text-align:center}.auth h1{text-align:center;margin-top:6px}.auth>.mu{text-align:center;margin-bottom:18px}
-.seg{display:flex;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:4px;margin-bottom:14px}
-.seg button{flex:1;border:0;background:none;color:var(--mu);padding:10px;border-radius:9px;font-weight:700;cursor:pointer}
-.seg button.on{background:var(--ac);color:#fff}
-#toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:#000;color:#fff;padding:11px 16px;border-radius:12px;font-size:14px;max-width:88%;opacity:0;pointer-events:none;transition:.2s;z-index:9}
+header{display:flex;align-items:center;gap:10px;padding:16px 20px 6px;position:relative}
+.logo{height:34px;display:block}header .sp{flex:1}
+.role{font-size:11px;font-weight:700;color:var(--or);background:rgba(247,147,29,.14);padding:5px 11px;border-radius:999px}
+.av{width:42px;height:42px;border-radius:50%;border:0;background:linear-gradient(135deg,var(--ac),var(--or));color:#fff;font:800 14px inherit;font-family:inherit;cursor:pointer;box-shadow:var(--sh)}
+.menu{position:absolute;right:20px;top:64px;background:var(--card);border-radius:20px;box-shadow:var(--sh);padding:14px 16px;z-index:5;min-width:190px}
+.menu b{display:block;margin-bottom:8px}
+main{padding:6px 20px calc(120px + env(safe-area-inset-bottom,0))}
+.hi{margin:14px 2px 4px}.hi small{color:var(--mu);font-weight:600}.hi h1{font-size:28px;font-weight:800;letter-spacing:-.5px;margin-top:2px}
+h2{font-size:17px;font-weight:800;margin:26px 2px 12px;letter-spacing:-.2px}
+.card{background:var(--card);border-radius:24px;padding:16px 18px;margin-bottom:12px;box-shadow:var(--sh)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.row2{display:flex;gap:10px;margin-top:14px}.row2 .btn{flex:1}
+.mu{color:var(--mu)}.sm{font-size:13px}p{margin-top:5px}
+.btn{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border:0;border-radius:999px;padding:14px 20px;font:700 15px inherit;font-family:inherit;cursor:pointer;width:100%;box-shadow:0 8px 20px rgba(23,107,141,.28)}
+.btn.alt{background:transparent;color:var(--ac);box-shadow:inset 0 0 0 1.5px var(--ac)}.btn.sm{padding:9px 16px;width:auto;box-shadow:none}
+.ghost{background:none;border:0;color:var(--mu);font:600 14px inherit;font-family:inherit;cursor:pointer;padding:8px}
+.tag{font-size:11px;font-weight:700;border-radius:999px;padding:4px 11px;background:var(--field);color:var(--mu);white-space:nowrap}
+.tag.confirmado{background:rgba(31,157,107,.16);color:var(--ok)}.tag.troca_solicitada,.tag.pendente{background:rgba(247,147,29,.16);color:var(--or)}
+.hero{background:linear-gradient(145deg,#1d7fa5,#0F4C66 70%);color:#fff;border-radius:30px;padding:22px;margin-bottom:12px;box-shadow:0 18px 40px rgba(15,76,102,.35);position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;right:-50px;top:-50px;width:170px;height:170px;border-radius:50%;background:rgba(247,147,29,.22)}
+.hero .tag{background:rgba(255,255,255,.2);color:#fff}.hero small{opacity:.8;font-weight:600}
+.hero .big{font-size:24px;font-weight:800;letter-spacing:-.4px;margin:6px 0 2px}.hero .fn{margin-top:10px;font-weight:700}
+.hero .btn{background:#fff;color:var(--ac2);box-shadow:none}.hero .btn.alt{background:rgba(255,255,255,.16);color:#fff;box-shadow:none}
+.hero>*{position:relative;z-index:1}
+.chips{display:flex;flex-wrap:wrap;gap:10px}.chip{background:var(--card);border-radius:999px;padding:9px 16px;font-size:14px;font-weight:700;box-shadow:var(--sh)}
+.chip:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--or);margin-right:8px}
+.warn{background:rgba(247,147,29,.15);color:var(--tx);border-radius:22px;padding:14px 16px;margin-top:14px;font-size:14px}
+.pe{display:flex;align-items:center;gap:12px;min-width:0}.pe .a{width:42px;height:42px;border-radius:50%;background:var(--field);color:var(--ac);display:grid;place-items:center;font-weight:800;font-size:14px;flex:none}
+.pe span{min-width:0}.pe .t{display:block;overflow:hidden;text-overflow:ellipsis}
+label{display:block;font-size:13px;font-weight:600;color:var(--mu);margin-bottom:14px}
+input,select{display:block;width:100%;margin-top:6px;padding:14px 16px;border-radius:16px;border:0;background:var(--field);color:var(--tx);font:500 16px inherit;font-family:inherit;outline:0}
+input:focus,select:focus{box-shadow:0 0 0 2px var(--ac)}
+nav{position:fixed;bottom:calc(14px + env(safe-area-inset-bottom,0));left:50%;transform:translateX(-50%);width:calc(100% - 40px);max-width:400px;display:flex;gap:4px;background:var(--glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-radius:999px;padding:7px;box-shadow:0 14px 40px rgba(10,30,45,.2)}
+nav button{flex:1;background:none;border:0;color:var(--mu);padding:9px 0 8px;font:700 11px inherit;font-family:inherit;cursor:pointer;position:relative;border-radius:999px}
+nav button.on{color:var(--ac);background:rgba(23,107,141,.12)}
+nav svg{width:22px;height:22px;display:block;margin:0 auto 3px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+nav i{position:absolute;top:2px;right:22%;background:var(--or);color:#fff;border-radius:999px;font-style:normal;font-size:10px;font-weight:800;padding:1px 6px}
+.auth{padding:44px 24px 30px}.auth .logo{height:auto;width:230px;margin:0 auto 10px}.auth h1{text-align:center;font-size:24px;font-weight:800}
+.auth .sub{text-align:center;color:var(--mu);margin:6px 0 22px}
+.seg{display:flex;background:var(--field);border-radius:999px;padding:5px;margin-bottom:16px}
+.seg button{flex:1;border:0;background:none;color:var(--mu);padding:11px;border-radius:999px;font:700 14px inherit;font-family:inherit;cursor:pointer}
+.seg button.on{background:var(--card);color:var(--ac);box-shadow:var(--sh)}
+.auth .card{padding:22px 20px;border-radius:30px}
+#toast{position:fixed;left:50%;bottom:104px;transform:translateX(-50%);background:#14212B;color:#fff;padding:12px 18px;border-radius:999px;font-size:14px;font-weight:600;max-width:88%;opacity:0;pointer-events:none;transition:.25s;z-index:9;text-align:center}
 #toast.on{opacity:1}
 </style>
 </head>
@@ -56,20 +76,23 @@ const app=document.getElementById('app'),$=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ST={pendente:'Pendente',confirmado:'Confirmado',troca_solicitada:'Troca pedida',recusado:'Recusado'};
 const fmt=d=>new Date(d).toLocaleString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Fortaleza'});
-let S={tab:'home',mode:'in',me:null,uid:null,vin:[],esc:[],min:{},fun:{},ev:[]};
+const ini=n=>String(n||'?').trim().split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();
+const LOGO=c=>`<picture><source media="(prefers-color-scheme: dark)" srcset="logo-branco.png"><img class="logo" src="logo-cor.png" alt="Casa Viva Fortaleza"${c||''}></picture>`;
+const IC={home:'<svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>',esc:'<svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3.5"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>',pes:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><circle cx="17" cy="9" r="2.4"/><path d="M17 14c2.4 0 4 1.7 4 4"/></svg>'};
+let S={tab:'home',mode:'in',me:null,uid:null,vin:[],esc:[],min:{},fun:{},ev:[],menu:false};
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),3800)}
 
 async function authView(){
   const {data}=await sb.from('ministerios').select('id,nome').eq('ativo_no_app',true).order('nome');
   const opts=(data||[]).map(m=>`<option value="${m.id}">${esc(m.nome)}</option>`).join('');
   const up=S.mode==='up';
-  app.innerHTML=`<div class="auth"><div class="logo">⛪</div><h1>Casa Viva</h1><p class="mu">Escalas de servos</p>
+  app.innerHTML=`<div class="auth">${LOGO()}<p class="sub">Escalas de servos</p>
   <div class="seg"><button data-act="mode" data-v="in" class="${up?'':'on'}">Entrar</button><button data-act="mode" data-v="up" class="${up?'on':''}">Cadastrar</button></div>
   <div class="card">${up?`<label>Nome completo<input id="nome" autocomplete="name"></label><label>WhatsApp<input id="wpp" type="tel" autocomplete="tel"></label><label>Ministério onde serve<select id="min"><option value="">Escolha…</option>${opts}</select></label>`:''}
   <label>E-mail<input id="em" type="email" autocomplete="email"></label>
   <label>Senha<input id="pw" type="password" autocomplete="${up?'new-password':'current-password'}" placeholder="mínimo 6 caracteres"></label>
   <button class="btn" data-act="${up?'signup':'signin'}">${up?'Criar meu cadastro':'Entrar'}</button></div>
-  ${up?'<p class="mu sm">Depois do cadastro, o líder do seu ministério precisa aprovar.</p>':''}</div>`;
+  ${up?'<p class="mu sm" style="text-align:center;margin-top:14px">Depois do cadastro, o líder do seu ministério precisa aprovar.</p>':''}</div>`;
 }
 async function signup(){
   const g=id=>$(id).value.trim();
@@ -85,7 +108,7 @@ async function load(){
   const [me,mins,funs,evs]=await Promise.all([q('servos','id,nome_completo,admin_geral').eq('user_id',S.uid).maybeSingle(),q('ministerios','id,nome,ativo_no_app'),q('funcoes','id,nome,ministerio_id'),q('eventos','id,nome,inicio,ceia').gte('inicio',new Date(Date.now()-864e5).toISOString()).order('inicio')]);
   if(me.error)return toast(me.error.message);
   S.me=me.data;
-  if(!S.me){app.innerHTML=`<div class="auth"><h1>Cadastro não encontrado</h1><p class="mu" style="text-align:center">Seu login existe, mas não está ligado a um servo. Fale com o líder do seu ministério ou com a administração.</p><br><button class="btn" data-act="out">Sair</button></div>`;return}
+  if(!S.me){app.innerHTML=`<div class="auth">${LOGO()}<h1 style="margin-top:18px">Cadastro não encontrado</h1><p class="sub">Seu login existe, mas não está ligado a um servo. Fale com o líder do seu ministério ou com a administração.</p><button class="btn" data-act="out">Sair</button></div>`;return}
   S.min=Object.fromEntries((mins.data||[]).map(m=>[m.id,m]));
   S.fun=Object.fromEntries((funs.data||[]).map(f=>[f.id,f]));
   S.ev=evs.data||[];
@@ -98,11 +121,14 @@ async function refresh(){
 const mine=()=>S.vin.filter(v=>v.servo_id===S.me.id);
 const manMins=()=>S.me.admin_geral?Object.values(S.min).filter(m=>m.ativo_no_app):mine().filter(v=>v.lider&&v.aprovado).map(v=>S.min[v.ministerio_id]).filter(Boolean);
 function myEsc(){return S.esc.filter(e=>e.servo_id===S.me.id).map(e=>({...e,ev:S.ev.find(x=>x.id===e.evento_id)})).filter(e=>e.ev&&new Date(e.ev.inicio)>Date.now()-144e5).sort((a,b)=>new Date(a.ev.inicio)-new Date(b.ev.inicio))}
-function escCard(e){return `<div class="card"><div class="row"><b>${esc(e.ev.nome)}${e.ev.ceia?' · Ceia':''}</b><span class="tag ${e.status}">${ST[e.status]}</span></div><p class="mu">${fmt(e.ev.inicio)}</p><p>${esc(S.min[e.ministerio_id]?.nome)} · <b>${esc(S.fun[e.funcao_id]?.nome)}</b></p>${e.status==='pendente'||e.status==='troca_solicitada'?`<div class="row2"><button class="btn" data-act="resp" data-id="${e.id}" data-v="confirmado">Confirmar</button><button class="btn alt" data-act="resp" data-id="${e.id}" data-v="troca_solicitada">Preciso trocar</button></div>`:''}</div>`}
+const btns=e=>e.status==='pendente'||e.status==='troca_solicitada'?`<div class="row2"><button class="btn" data-act="resp" data-id="${e.id}" data-v="confirmado">Confirmar</button><button class="btn alt" data-act="resp" data-id="${e.id}" data-v="troca_solicitada">Preciso trocar</button></div>`:'';
+function escCard(e){return `<div class="card"><div class="row"><b>${esc(e.ev.nome)}${e.ev.ceia?' · Ceia':''}</b><span class="tag ${e.status}">${ST[e.status]}</span></div><p class="mu">${fmt(e.ev.inicio)}</p><p>${esc(S.min[e.ministerio_id]?.nome)} · <b>${esc(S.fun[e.funcao_id]?.nome)}</b></p>${btns(e)}</div>`}
+function hero(e){return `<div class="hero"><div class="row"><small>Sua próxima escala</small><span class="tag">${ST[e.status]}</span></div><div class="big">${esc(e.ev.nome)}${e.ev.ceia?' · Ceia':''}</div><small>${fmt(e.ev.inicio)}</small><div class="fn">${esc(S.min[e.ministerio_id]?.nome)} · ${esc(S.fun[e.funcao_id]?.nome)}</div>${btns(e)}</div>`}
 function pgHome(){
   const pend=mine().filter(v=>!v.aprovado),ok=mine().filter(v=>v.aprovado),n=myEsc()[0];
-  return `${pend.length?`<div class="warn">Aguardando aprovação do líder: <b>${pend.map(v=>esc(S.min[v.ministerio_id]?.nome)).join(', ')}</b>.</div>`:''}
-  <h2>Próxima escala</h2>${n?escCard(n):'<div class="card mu">Você ainda não foi escalado.</div>'}
+  return `<div class="hi"><small>Que bom ter você aqui,</small><h1>${esc(S.me.nome_completo.split(' ')[0])}</h1></div>
+  ${pend.length?`<div class="warn">Aguardando aprovação do líder: <b>${pend.map(v=>esc(S.min[v.ministerio_id]?.nome)).join(', ')}</b>.</div>`:''}
+  <h2>Próxima escala</h2>${n?hero(n):'<div class="card mu">Você ainda não foi escalado.</div>'}
   <h2>Meus ministérios</h2><div class="chips">${ok.length?ok.map(v=>`<span class="chip">${esc(S.min[v.ministerio_id]?.nome)}${v.lider?' · líder':''}</span>`).join(''):'<span class="mu">Nenhum ainda.</span>'}</div>`}
 function pgEsc(){
   const list=myEsc(),mm=manMins();
@@ -116,29 +142,32 @@ function fillSel(){
     $('fFun').innerHTML=Object.values(S.fun).filter(f=>f.ministerio_id===m).map(f=>`<option value="${f.id}">${esc(f.nome)}</option>`).join('')||'<option value="">Sem funções cadastradas</option>';
     $('fSer').innerHTML=S.vin.filter(v=>v.ministerio_id===m&&v.aprovado).map(v=>`<option value="${v.servo_id}">${esc(v.servos?.nome_completo)}</option>`).join('')||'<option value="">Nenhum servo aprovado</option>';
     const rows=S.esc.filter(e=>e.evento_id===fe.value&&e.ministerio_id===m);
-    $('lista').innerHTML='<h2>Escalados neste culto</h2>'+(rows.length?rows.map(e=>{const v=S.vin.find(x=>x.servo_id===e.servo_id&&x.ministerio_id===m);return `<div class="card row"><span><b>${esc(v?.servos?.nome_completo||'—')}</b><br><span class="mu">${esc(S.fun[e.funcao_id]?.nome)} · ${ST[e.status]}</span></span><button class="ghost" data-act="del" data-id="${e.id}">Remover</button></div>`}).join(''):'<div class="card mu">Ninguém escalado ainda.</div>')};
+    $('lista').innerHTML='<h2>Escalados neste culto</h2>'+(rows.length?rows.map(e=>{const v=S.vin.find(x=>x.servo_id===e.servo_id&&x.ministerio_id===m),n=v?.servos?.nome_completo||'—';return `<div class="card row"><div class="pe"><div class="a">${esc(ini(n))}</div><span><b class="t">${esc(n)}</b><span class="mu sm">${esc(S.fun[e.funcao_id]?.nome)} · ${ST[e.status]}</span></span></div><button class="ghost" data-act="del" data-id="${e.id}">Remover</button></div>`}).join(''):'<div class="card mu">Ninguém escalado ainda.</div>')};
   fe.onchange=fm.onchange=draw;draw()}
 function pgPes(){
   const ids=manMins().map(m=>m.id),rows=S.vin.filter(v=>ids.includes(v.ministerio_id)&&v.servo_id!==S.me.id);
   const pend=rows.filter(v=>!v.aprovado),ok=rows.filter(v=>v.aprovado);
-  const card=(v,p)=>`<div class="card row"><span><b>${esc(v.servos?.nome_completo)}</b>${v.lider?' <span class="tag confirmado">líder</span>':''}<br><span class="mu">${esc(S.min[v.ministerio_id]?.nome)}${v.servos?.whatsapp?' · '+esc(v.servos.whatsapp):''}</span></span>${p?`<span class="row2"><button class="btn sm" data-act="apr" data-s="${v.servo_id}" data-m="${v.ministerio_id}">Aprovar</button><button class="ghost" data-act="rec" data-s="${v.servo_id}" data-m="${v.ministerio_id}">Recusar</button></span>`:''}</div>`;
+  const card=(v,p)=>{const n=v.servos?.nome_completo;return `<div class="card row"><div class="pe"><div class="a">${esc(ini(n))}</div><span><b class="t">${esc(n)}${v.lider?' · líder':''}</b><span class="mu sm">${esc(S.min[v.ministerio_id]?.nome)}${v.servos?.whatsapp?' · '+esc(v.servos.whatsapp):''}</span></span></div>${p?`<span class="row2" style="margin:0"><button class="btn sm" data-act="apr" data-s="${v.servo_id}" data-m="${v.ministerio_id}">Aprovar</button><button class="ghost" data-act="rec" data-s="${v.servo_id}" data-m="${v.ministerio_id}">Recusar</button></span>`:''}</div>`};
   return `<h2>Pedidos de cadastro (${pend.length})</h2>${pend.length?pend.map(v=>card(v,1)).join(''):'<div class="card mu">Nenhum pedido.</div>'}<h2>Servos (${ok.length})</h2>${ok.length?ok.map(v=>card(v,0)).join(''):'<div class="card mu">Ainda não há servos aprovados.</div>'}`}
 function render(){
-  const mm=manMins(),man=mm.length>0,tabs=[['home','Home','⌂'],['esc','Escalas','▦']];if(man)tabs.push(['pes','Pessoas','☺']);
+  const mm=manMins(),man=mm.length>0,tabs=[['home','Home'],['esc','Escalas']];if(man)tabs.push(['pes','Pessoas']);
   const ids=mm.map(m=>m.id),pend=S.vin.filter(v=>!v.aprovado&&v.servo_id!==S.me.id&&ids.includes(v.ministerio_id)).length;
   if(S.tab==='pes'&&!man)S.tab='home';
   const body=S.tab==='esc'?pgEsc():S.tab==='pes'?pgPes():pgHome();
   const role=S.me.admin_geral?'Administração':mine().some(v=>v.lider&&v.aprovado)?'Líder':'Servo';
-  app.innerHTML=`<header><div class="av">${esc(S.me.nome_completo[0])}</div><b>${esc(S.me.nome_completo.split(' ')[0])}<small>${role}</small></b><button class="ghost" data-act="out">Sair</button></header><main>${body}</main><nav>${tabs.map(t=>`<button data-act="tab" data-v="${t[0]}" class="${S.tab===t[0]?'on':''}"><span>${t[2]}</span>${t[1]}${t[0]==='pes'&&pend?`<i>${pend}</i>`:''}</button>`).join('')}</nav>`;
+  app.innerHTML=`<header>${LOGO()}<span class="sp"></span><span class="role">${role}</span><button class="av" data-act="menu" aria-label="Menu">${esc(ini(S.me.nome_completo))}</button>${S.menu?`<div class="menu"><b>${esc(S.me.nome_completo)}</b><button class="btn alt sm" data-act="out">Sair</button></div>`:''}</header><main>${body}</main><nav>${tabs.map(t=>`<button data-act="tab" data-v="${t[0]}" class="${S.tab===t[0]?'on':''}">${IC[t[0]]}${t[1]}${t[0]==='pes'&&pend?`<i>${pend}</i>`:''}</button>`).join('')}</nav>`;
   if(S.tab==='esc')fillSel()}
 document.addEventListener('click',async ev=>{
-  const b=ev.target.closest('[data-act]');if(!b)return;const a=b.dataset.act,d=b.dataset;
+  const b=ev.target.closest('[data-act]');
+  if(!b){if(S.menu&&S.me){S.menu=false;render()}return}
+  const a=b.dataset.act,d=b.dataset;
   try{
+    if(a==='menu'){S.menu=!S.menu;return render()}
     if(a==='mode'){S.mode=d.v;return authView()}
     if(a==='signin'){const {error}=await sb.auth.signInWithPassword({email:$('em').value.trim(),password:$('pw').value});if(error)toast(/invalid/i.test(error.message)?'E-mail ou senha incorretos.':error.message);return}
     if(a==='signup')return signup();
-    if(a==='out'){S.me=null;S.uid=null;await sb.auth.signOut();return}
-    if(a==='tab'){S.tab=d.v;return refresh()}
+    if(a==='out'){S.me=null;S.uid=null;S.menu=false;await sb.auth.signOut();return}
+    if(a==='tab'){S.tab=d.v;S.menu=false;return refresh()}
     if(a==='resp'){const {error}=await sb.rpc('responder_escala',{p_escala:d.id,p_status:d.v});if(error)throw error;toast('Resposta enviada.')}
     if(a==='apr'){const {error}=await sb.from('servo_ministerios').update({aprovado:true}).eq('servo_id',d.s).eq('ministerio_id',d.m);if(error)throw error;toast('Servo aprovado.')}
     if(a==='rec'){if(!confirm('Recusar este pedido?'))return;const {error}=await sb.from('servo_ministerios').delete().eq('servo_id',d.s).eq('ministerio_id',d.m);if(error)throw error}
