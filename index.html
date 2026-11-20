@@ -62,6 +62,12 @@ nav i{position:absolute;top:2px;right:22%;background:var(--or);color:#fff;border
 .seg button{flex:1;border:0;background:none;color:var(--mu);padding:11px;border-radius:999px;font:700 14px inherit;font-family:inherit;cursor:pointer}
 .seg button.on{background:var(--card);color:var(--ac);box-shadow:var(--sh)}
 .auth .card{padding:22px 20px;border-radius:30px}
+textarea{display:block;width:100%;margin-top:6px;padding:14px 16px;border-radius:16px;border:0;background:var(--field);color:var(--tx);font:500 16px inherit;font-family:inherit;outline:0;resize:vertical;min-height:72px}
+textarea:focus{box-shadow:0 0 0 2px var(--ac)}
+.yt{display:inline-block;background:rgba(247,147,29,.16);color:var(--or);border-radius:999px;padding:6px 13px;font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap}
+.mini{background:var(--field);border:0;color:var(--tx);width:34px;height:34px;border-radius:50%;font-size:15px;cursor:pointer;font-family:inherit}
+.acts{display:flex;gap:6px;align-items:center;flex:none}.t{overflow:hidden;text-overflow:ellipsis}
+.sg{display:flex;align-items:center;gap:12px}.sg .n{width:30px;height:30px;border-radius:50%;background:var(--field);color:var(--ac);display:grid;place-items:center;font-weight:800;font-size:13px;flex:none}
 #toast{position:fixed;left:50%;bottom:104px;transform:translateX(-50%);background:#14212B;color:#fff;padding:12px 18px;border-radius:999px;font-size:14px;font-weight:600;max-width:88%;opacity:0;pointer-events:none;transition:.25s;z-index:9;text-align:center}
 #toast.on{opacity:1}
 </style>
@@ -78,8 +84,8 @@ const ST={pendente:'Pendente',confirmado:'Confirmado',troca_solicitada:'Troca pe
 const fmt=d=>new Date(d).toLocaleString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Fortaleza'});
 const ini=n=>String(n||'?').trim().split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();
 const LOGO=c=>`<picture><source media="(prefers-color-scheme: dark)" srcset="logo-branco.png"><img class="logo" src="logo-cor.png" alt="Casa Viva Fortaleza"${c||''}></picture>`;
-const IC={home:'<svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>',esc:'<svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3.5"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>',pes:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><circle cx="17" cy="9" r="2.4"/><path d="M17 14c2.4 0 4 1.7 4 4"/></svg>'};
-let S={tab:'home',mode:'in',me:null,uid:null,vin:[],esc:[],min:{},fun:{},ev:[],menu:false};
+const IC={home:'<svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>',esc:'<svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3.5"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>',mus:'<svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg>',pes:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><circle cx="17" cy="9" r="2.4"/><path d="M17 14c2.4 0 4 1.7 4 4"/></svg>'};
+let S={tab:'home',mode:'in',me:null,uid:null,vin:[],esc:[],min:{},fun:{},ev:[],menu:false,mus:[],set:[],q:'',mEv:null,mForm:null};
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),3800)}
 
 async function authView(){
@@ -115,8 +121,8 @@ async function load(){
   await refresh();
 }
 async function refresh(){
-  const [v,e]=await Promise.all([sb.from('servo_ministerios').select('servo_id,ministerio_id,lider,aprovado,servos(nome_completo,whatsapp)'),sb.from('escalas').select('id,evento_id,ministerio_id,funcao_id,servo_id,status')]);
-  S.vin=v.data||[];S.esc=e.data||[];render();
+  const [v,e,mu,st]=await Promise.all([sb.from('servo_ministerios').select('servo_id,ministerio_id,lider,aprovado,servos(nome_completo,whatsapp)'),sb.from('escalas').select('id,evento_id,ministerio_id,funcao_id,servo_id,status'),sb.from('musicas').select('id,titulo,artista,tom,versao,youtube_url,observacao').order('titulo'),sb.from('setlist_itens').select('evento_id,ordem,musica_id,tom')]);
+  S.vin=v.data||[];S.esc=e.data||[];S.mus=mu.data||[];S.set=st.data||[];render();
 }
 const mine=()=>S.vin.filter(v=>v.servo_id===S.me.id);
 const manMins=()=>S.me.admin_geral?Object.values(S.min).filter(m=>m.ativo_no_app):mine().filter(v=>v.lider&&v.aprovado).map(v=>S.min[v.ministerio_id]).filter(Boolean);
@@ -144,16 +150,40 @@ function fillSel(){
     const rows=S.esc.filter(e=>e.evento_id===fe.value&&e.ministerio_id===m);
     $('lista').innerHTML='<h2>Escalados neste culto</h2>'+(rows.length?rows.map(e=>{const v=S.vin.find(x=>x.servo_id===e.servo_id&&x.ministerio_id===m),n=v?.servos?.nome_completo||'—';return `<div class="card row"><div class="pe"><div class="a">${esc(ini(n))}</div><span><b class="t">${esc(n)}</b><span class="mu sm">${esc(S.fun[e.funcao_id]?.nome)} · ${ST[e.status]}</span></span></div><button class="ghost" data-act="del" data-id="${e.id}">Remover</button></div>`}).join(''):'<div class="card mu">Ninguém escalado ainda.</div>')};
   fe.onchange=fm.onchange=draw;draw()}
+const louvorId=()=>Object.values(S.min).find(m=>m.nome==='Louvor')?.id;
+const isLouvor=()=>S.me.admin_geral||mine().some(v=>v.aprovado&&v.ministerio_id===louvorId());
+const canMus=()=>S.me.admin_geral||mine().some(v=>v.lider&&v.aprovado&&v.ministerio_id===louvorId());
+const ytOk=u=>{try{const x=new URL(u);return x.protocol==='https:'&&/^(www\.|m\.)?(youtube\.com|youtu\.be)$/.test(x.hostname)}catch(e){return false}};
+const ytBtn=u=>u?`<a class="yt" href="${esc(u)}" target="_blank" rel="noopener">▶ Ouvir</a>`:'';
+const sub=(m,tom)=>esc([m.artista,(tom||m.tom)&&'Tom '+(tom||m.tom),m.versao].filter(Boolean).join(' · '));
+function setlistHtml(){
+  const items=S.set.filter(i=>i.evento_id===S.mEv).sort((a,b)=>a.ordem-b.ordem),c=canMus();
+  return items.length?items.map((i,k)=>{const m=S.mus.find(x=>x.id===i.musica_id)||{titulo:'(música removida)'};
+    return `<div class="card row"><div class="sg" style="min-width:0"><div class="n">${k+1}</div><div style="min-width:0"><b class="t" style="display:block">${esc(m.titulo)}</b><span class="mu sm">${sub(m,i.tom)}</span></div></div><div class="acts">${ytBtn(m.youtube_url)}${c?`<button class="mini" data-act="set-up" data-o="${i.ordem}" aria-label="Subir">↑</button><button class="mini" data-act="set-down" data-o="${i.ordem}" aria-label="Descer">↓</button><button class="mini" data-act="set-del" data-o="${i.ordem}" aria-label="Remover">✕</button>`:''}</div></div>`}).join(''):'<div class="card mu">Repertório ainda não montado para este culto.</div>'}
+function libHtml(){
+  const q=(S.q||'').trim().toLowerCase(),c=canMus();
+  const l=S.mus.filter(m=>!q||[m.titulo,m.artista,m.versao].join(' ').toLowerCase().includes(q));
+  return l.length?l.map(m=>`<div class="card row"><div style="min-width:0"><b class="t" style="display:block">${esc(m.titulo)}</b><span class="mu sm">${sub(m)}</span>${m.observacao?`<p class="mu sm">${esc(m.observacao)}</p>`:''}</div><div class="acts">${ytBtn(m.youtube_url)}${c?`<button class="mini" data-act="mus-edit" data-id="${m.id}" aria-label="Editar">✎</button>`:''}</div></div>`).join(''):`<div class="card mu">${S.mus.length?'Nenhuma música encontrada.':'Nenhuma música cadastrada ainda.'}</div>`}
+function formHtml(){
+  const f=S.mForm;if(!f)return '';const v=k=>esc(f[k]||'');
+  return `<div class="card"><b>${f.id?'Editar música':'Nova música'}</b><br><br><label>Título<input id="fT" value="${v('titulo')}"></label><label>Artista ou ministério<input id="fA" value="${v('artista')}"></label><label>Tom<input id="fK" value="${v('tom')}" placeholder="Ex.: G"></label><label>Versão<input id="fV" value="${v('versao')}" placeholder="Ex.: original, versão Ana"></label><label>Link do YouTube (versão de referência)<input id="fY" type="url" value="${v('youtube_url')}" placeholder="https://youtu.be/…"></label><label>Observação<textarea id="fO">${v('observacao')}</textarea></label><div class="row2"><button class="btn" data-act="mus-save">Salvar</button><button class="btn alt" data-act="mus-cancel">Cancelar</button></div>${f.id?'<button class="ghost" data-act="mus-del">Excluir música</button>':''}</div>`}
+function pgMus(){
+  const c=canMus(),evs=S.ev.filter(e=>new Date(e.inicio)>Date.now()-144e5);
+  if(!S.mEv||!evs.some(e=>e.id===S.mEv))S.mEv=evs[0]?.id;
+  let h=`<h2>Repertório do culto</h2><div class="card"><label style="margin:0">Culto<select id="mEv">${evs.map(e=>`<option value="${e.id}"${e.id===S.mEv?' selected':''}>${esc(e.nome)} · ${fmt(e.inicio)}</option>`).join('')}</select></label></div><div id="mset">${setlistHtml()}</div>`;
+  if(c)h+=`<div class="card"><label>Adicionar ao repertório<select id="mSong">${S.mus.map(m=>`<option value="${m.id}">${esc(m.titulo)}${m.versao?' ('+esc(m.versao)+')':''}</option>`).join('')||'<option value="">Cadastre músicas primeiro</option>'}</select></label><label>Tom neste culto (opcional)<input id="mTom" placeholder="Vazio = tom padrão da música"></label><button class="btn" data-act="set-add">Adicionar</button></div>`;
+  h+=`<h2>Biblioteca de músicas</h2>${c&&!S.mForm?'<button class="btn alt" style="margin-bottom:12px" data-act="mus-new">+ Nova música</button>':''}${formHtml()}<div class="card" style="padding:6px 8px"><input id="mQ" type="search" placeholder="Buscar por título, artista ou versão" value="${esc(S.q||'')}" style="margin:0"></div><div id="mlib">${libHtml()}</div>`;
+  return h}
 function pgPes(){
   const ids=manMins().map(m=>m.id),rows=S.vin.filter(v=>ids.includes(v.ministerio_id)&&v.servo_id!==S.me.id);
   const pend=rows.filter(v=>!v.aprovado),ok=rows.filter(v=>v.aprovado);
   const card=(v,p)=>{const n=v.servos?.nome_completo;return `<div class="card row"><div class="pe"><div class="a">${esc(ini(n))}</div><span><b class="t">${esc(n)}${v.lider?' · líder':''}</b><span class="mu sm">${esc(S.min[v.ministerio_id]?.nome)}${v.servos?.whatsapp?' · '+esc(v.servos.whatsapp):''}</span></span></div>${p?`<span class="row2" style="margin:0"><button class="btn sm" data-act="apr" data-s="${v.servo_id}" data-m="${v.ministerio_id}">Aprovar</button><button class="ghost" data-act="rec" data-s="${v.servo_id}" data-m="${v.ministerio_id}">Recusar</button></span>`:''}</div>`};
   return `<h2>Pedidos de cadastro (${pend.length})</h2>${pend.length?pend.map(v=>card(v,1)).join(''):'<div class="card mu">Nenhum pedido.</div>'}<h2>Servos (${ok.length})</h2>${ok.length?ok.map(v=>card(v,0)).join(''):'<div class="card mu">Ainda não há servos aprovados.</div>'}`}
 function render(){
-  const mm=manMins(),man=mm.length>0,tabs=[['home','Home'],['esc','Escalas']];if(man)tabs.push(['pes','Pessoas']);
+  const mm=manMins(),man=mm.length>0,tabs=[['home','Home'],['esc','Escalas']];if(isLouvor())tabs.push(['mus','Música']);if(man)tabs.push(['pes','Pessoas']);
   const ids=mm.map(m=>m.id),pend=S.vin.filter(v=>!v.aprovado&&v.servo_id!==S.me.id&&ids.includes(v.ministerio_id)).length;
-  if(S.tab==='pes'&&!man)S.tab='home';
-  const body=S.tab==='esc'?pgEsc():S.tab==='pes'?pgPes():pgHome();
+  if(S.tab==='pes'&&!man)S.tab='home';if(S.tab==='mus'&&!isLouvor())S.tab='home';
+  const body=S.tab==='esc'?pgEsc():S.tab==='mus'?pgMus():S.tab==='pes'?pgPes():pgHome();
   const role=S.me.admin_geral?'Administração':mine().some(v=>v.lider&&v.aprovado)?'Líder':'Servo';
   app.innerHTML=`<header>${LOGO()}<span class="sp"></span><span class="role">${role}</span><button class="av" data-act="menu" aria-label="Menu">${esc(ini(S.me.nome_completo))}</button>${S.menu?`<div class="menu"><b>${esc(S.me.nome_completo)}</b><button class="btn alt sm" data-act="out">Sair</button></div>`:''}</header><main>${body}</main><nav>${tabs.map(t=>`<button data-act="tab" data-v="${t[0]}" class="${S.tab===t[0]?'on':''}">${IC[t[0]]}${t[1]}${t[0]==='pes'&&pend?`<i>${pend}</i>`:''}</button>`).join('')}</nav>`;
   if(S.tab==='esc')fillSel()}
@@ -173,9 +203,22 @@ document.addEventListener('click',async ev=>{
     if(a==='rec'){if(!confirm('Recusar este pedido?'))return;const {error}=await sb.from('servo_ministerios').delete().eq('servo_id',d.s).eq('ministerio_id',d.m);if(error)throw error}
     if(a==='add'){const r={evento_id:$('fEv').value,ministerio_id:$('fMin').value,funcao_id:$('fFun').value,servo_id:$('fSer').value};if(!r.funcao_id||!r.servo_id)return toast('Escolha função e servo.');const {error}=await sb.from('escalas').insert(r);if(error)throw error;toast('Servo escalado.')}
     if(a==='del'){const {error}=await sb.from('escalas').delete().eq('id',d.id);if(error)throw error}
+    if(a==='mus-new'){S.mForm={};return render()}
+    if(a==='mus-cancel'){S.mForm=null;return render()}
+    if(a==='mus-edit'){S.mForm=S.mus.find(m=>m.id===d.id);return render()}
+    if(a==='mus-save'){const g=id=>$(id).value.trim(),r={titulo:g('fT'),artista:g('fA')||null,tom:g('fK')||null,versao:g('fV')||null,youtube_url:g('fY')||null,observacao:g('fO')||null};
+      if(!r.titulo)return toast('Digite o título.');
+      if(r.youtube_url&&!ytOk(r.youtube_url))return toast('O link precisa ser do YouTube e começar com https://');
+      const id=S.mForm.id,{error}=id?await sb.from('musicas').update(r).eq('id',id):await sb.from('musicas').insert(r);if(error)throw error;S.mForm=null;toast('Música salva.')}
+    if(a==='mus-del'){if(!confirm('Excluir esta música?'))return;const {error}=await sb.from('musicas').delete().eq('id',S.mForm.id);if(error)throw error;S.mForm=null;toast('Música excluída.')}
+    if(a==='set-add'){if(!S.mEv)return toast('Não há culto futuro cadastrado.');const mid=$('mSong').value;if(!mid)return toast('Escolha uma música.');const mx=Math.max(0,...S.set.filter(i=>i.evento_id===S.mEv).map(i=>i.ordem));const {error}=await sb.from('setlist_itens').insert({evento_id:S.mEv,ordem:mx+1,musica_id:mid,tom:$('mTom').value.trim()||null});if(error)throw error;toast('Adicionada ao repertório.')}
+    if(a==='set-up'||a==='set-down'){const {error}=await sb.rpc('mover_setlist',{p_evento:S.mEv,p_ordem:+d.o,p_dir:a==='set-up'?-1:1});if(error)throw error}
+    if(a==='set-del'){const {error}=await sb.from('setlist_itens').delete().eq('evento_id',S.mEv).eq('ordem',+d.o);if(error)throw error}
     await refresh();
-  }catch(e){toast(/duplicate|unique/i.test(e.message)?'Esse servo já está escalado neste culto.':e.message)}
+  }catch(e){toast(/musicas_unica/.test(e.message)?'Essa música, com essa versão, já está cadastrada.':/foreign key/i.test(e.message)?'Essa música está em algum repertório. Remova de lá primeiro.':/duplicate|unique/i.test(e.message)?'Esse item já existe ou o servo já está escalado neste culto.':e.message)}
 });
+document.addEventListener('input',e=>{if(e.target.id==='mQ'){S.q=e.target.value;const x=$('mlib');if(x)x.innerHTML=libHtml()}});
+document.addEventListener('change',e=>{if(e.target.id==='mEv'){S.mEv=e.target.value;const x=$('mset');if(x)x.innerHTML=setlistHtml()}});
 sb.auth.onAuthStateChange((ev,s)=>{
   if(ev==='SIGNED_OUT'){S.uid=null;setTimeout(authView,0)}
   else if(s&&s.user&&S.uid!==s.user.id){S.uid=s.user.id;setTimeout(load,0)}
