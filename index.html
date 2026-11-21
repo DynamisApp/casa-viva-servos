@@ -68,7 +68,8 @@ textarea:focus{box-shadow:0 0 0 2px var(--ac)}
 .mini{background:var(--field);border:0;color:var(--tx);width:34px;height:34px;border-radius:50%;font-size:15px;cursor:pointer;font-family:inherit}
 .acts{display:flex;gap:6px;align-items:center;flex:none}.t{overflow:hidden;text-overflow:ellipsis}
 .sg{display:flex;align-items:center;gap:12px}.sg .n{width:30px;height:30px;border-radius:50%;background:var(--field);color:var(--ac);display:grid;place-items:center;font-weight:800;font-size:13px;flex:none}
-.hs{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -20px;padding:2px 20px 12px;scrollbar-width:none}.hs::-webkit-scrollbar{display:none}
+.pz{opacity:.72}
+.hs{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 20px;margin:-6px -20px -22px;padding:6px 20px 34px;scrollbar-width:none}.hs::-webkit-scrollbar{display:none}
 .hs>*{scroll-snap-align:start;flex:none}
 .mcard{width:150px;border-radius:26px;padding:16px;color:#fff;display:flex;flex-direction:column;gap:3px;box-shadow:var(--sh);min-height:128px;justify-content:flex-end;position:relative;overflow:hidden}
 .mcard .em{font-size:30px;position:absolute;top:14px;left:16px}.mcard b{font-size:16px}.mcard small{opacity:.85;font-weight:600}
@@ -134,7 +135,7 @@ async function load(){
   await refresh();
 }
 async function refresh(){
-  const [v,e,mu,st,av,an]=await Promise.all([sb.from('servo_ministerios').select('servo_id,ministerio_id,lider,aprovado,servos(nome_completo,whatsapp)'),sb.from('escalas').select('id,evento_id,ministerio_id,funcao_id,servo_id,status'),sb.from('musicas').select('id,titulo,artista,tom,versao,youtube_url,observacao').order('titulo'),sb.from('setlist_itens').select('evento_id,ordem,musica_id,tom'),sb.from('avisos').select('id,titulo,texto,ministerio_id,destaque,expira_em,criado_em').order('criado_em',{ascending:false}),sb.rpc('aniversariantes',{p_mes:mesAtual()})]);
+  const [v,e,mu,st,av,an]=await Promise.all([sb.from('servo_ministerios').select('servo_id,ministerio_id,lider,aprovado,pausado,servos(nome_completo,whatsapp)'),sb.from('escalas').select('id,evento_id,ministerio_id,funcao_id,servo_id,status'),sb.from('musicas').select('id,titulo,artista,tom,versao,youtube_url,observacao').order('titulo'),sb.from('setlist_itens').select('evento_id,ordem,musica_id,tom'),sb.from('avisos').select('id,titulo,texto,ministerio_id,destaque,expira_em,criado_em').order('criado_em',{ascending:false}),sb.rpc('aniversariantes',{p_mes:mesAtual()})]);
   S.vin=v.data||[];S.esc=e.data||[];S.mus=mu.data||[];S.set=st.data||[];S.av=av.data||[];S.an=an.data||[];render();
 }
 async function loadAn(){const {data}=await sb.rpc('aniversariantes',{p_mes:S.anMes||mesAtual()});S.anList=data||[];render()}
@@ -164,6 +165,7 @@ function pgHome(){
   const mc=mins.map((m,i)=>{const lead=mm.some(x=>x.id===m.id);return `<div class="mcard g${i%4}"><span class="em">${EMO[m.nome]||'✨'}</span><b>${esc(m.nome)}</b><small>${lead?S.vin.filter(v=>v.ministerio_id===m.id&&v.aprovado).length+' servos':list.filter(e=>e.ministerio_id===m.id).length+' escalas suas'}</small></div>`}).join('');
   const av=avAtivos().slice(0,3);
   return `<div class="hi"><small>Que bom ter você aqui,</small><h1>${esc(S.me.nome_completo.split(' ')[0])}</h1></div>
+  ${mine().some(v=>v.pausado)?`<div class="warn">Sua participação está pausada em: <b>${mine().filter(v=>v.pausado).map(v=>esc(S.min[v.ministerio_id]?.nome)).join(', ')}</b>. Fale com o líder para voltar.</div>`:''}
   ${pend.length?`<div class="warn">Aguardando aprovação do líder: <b>${pend.map(v=>esc(S.min[v.ministerio_id]?.nome)).join(', ')}</b>.</div>`:''}
   <h2>Próxima escala</h2>${n?hero(n):'<div class="card mu">Você ainda não foi escalado.</div>'}
   ${list.length>1?`<div class="hs">${list.slice(1,8).map(ecard).join('')}</div>`:''}
@@ -193,7 +195,7 @@ function fillSel(){
   if(S.sel){fe.value=S.sel.e;fm.value=S.sel.m}
   const draw=()=>{const m=fm.value;S.sel={e:fe.value,m};
     $('fFun').innerHTML=Object.values(S.fun).filter(f=>f.ministerio_id===m).map(f=>`<option value="${f.id}">${esc(f.nome)}</option>`).join('')||'<option value="">Sem funções cadastradas</option>';
-    $('fSer').innerHTML=S.vin.filter(v=>v.ministerio_id===m&&v.aprovado).map(v=>`<option value="${v.servo_id}">${esc(v.servos?.nome_completo)}</option>`).join('')||'<option value="">Nenhum servo aprovado</option>';
+    $('fSer').innerHTML=S.vin.filter(v=>v.ministerio_id===m&&v.aprovado&&!v.pausado).map(v=>`<option value="${v.servo_id}">${esc(v.servos?.nome_completo)}</option>`).join('')||'<option value="">Nenhum servo aprovado</option>';
     const ev=S.ev.find(x=>x.id===fe.value),mn=S.min[m]?.nome,rows=S.esc.filter(e=>e.evento_id===fe.value&&e.ministerio_id===m);
     const info=e=>{const v=S.vin.find(x=>x.servo_id===e.servo_id&&x.ministerio_id===m);return {n:v?.servos?.nome_completo||'—',t:v?.servos?.whatsapp,f:S.fun[e.funcao_id]?.nome}};
     const msg=(p,e)=>`Paz, ${p.n.split(' ')[0]}! Você está escalado(a) no ${ev.nome} (${fmt(ev.inicio)}) – ${mn}, função ${p.f}.${ev.paleta?' Roupa: '+ev.paleta+'.':''} Confirme no app: ${appUrl()}`;
@@ -226,7 +228,9 @@ function pgMus(){
 function pgPes(){
   const ids=manMins().map(m=>m.id),rows=S.vin.filter(v=>ids.includes(v.ministerio_id)&&v.servo_id!==S.me.id);
   const pend=rows.filter(v=>!v.aprovado),ok=rows.filter(v=>v.aprovado);
-  const card=(v,p)=>{const n=v.servos?.nome_completo;return `<div class="card row"><div class="pe"><div class="a">${esc(ini(n))}</div><span><b class="t">${esc(n)}${v.lider?' · líder':''}</b><span class="mu sm">${esc(S.min[v.ministerio_id]?.nome)}${v.servos?.whatsapp?' · '+esc(v.servos.whatsapp):''}</span></span></div>${p?`<span class="row2" style="margin:0"><button class="btn sm" data-act="apr" data-s="${v.servo_id}" data-m="${v.ministerio_id}">Aprovar</button><button class="ghost" data-act="rec" data-s="${v.servo_id}" data-m="${v.ministerio_id}">Recusar</button></span>`:''}</div>`};
+  const card=(v,p)=>{const n=v.servos?.nome_completo,mn=S.min[v.ministerio_id]?.nome,da=`data-s="${v.servo_id}" data-m="${v.ministerio_id}" data-n="${esc(n)}"`,can=S.me.admin_geral||!v.lider;
+    const acts=p?`<button class="btn sm" data-act="apr" ${da}>Aprovar</button><button class="ghost" data-act="rec" ${da}>Recusar</button>`:can?`<button class="btn alt sm" data-act="pause" ${da} data-p="${v.pausado?0:1}">${v.pausado?'Retomar':'Pausar'}</button><button class="ghost" data-act="rm" ${da}>Excluir</button>${S.me.admin_geral?`<button class="ghost" data-act="rmall" ${da}>Excluir da igreja</button>`:''}`:'';
+    return `<div class="card${v.pausado?' pz':''}"><div class="row"><div class="pe"><div class="a">${esc(ini(n))}</div><span><b class="t">${esc(n)}${v.lider?' · líder':''}</b><span class="mu sm">${esc(mn)}${v.servos?.whatsapp?' · '+esc(v.servos.whatsapp):''}</span></span></div>${v.pausado?'<span class="tag pendente">Pausado</span>':''}</div>${acts?`<div class="row2" style="align-items:center;flex-wrap:wrap">${acts}</div>`:''}</div>`};
   return `<h2>Pedidos de cadastro (${pend.length})</h2>${pend.length?pend.map(v=>card(v,1)).join(''):'<div class="card mu">Nenhum pedido.</div>'}<h2>Servos (${ok.length})</h2>${ok.length?ok.map(v=>card(v,0)).join(''):'<div class="card mu">Ainda não há servos aprovados.</div>'}`}
 function render(){
   const mm=manMins(),man=mm.length>0,tabs=[['home','Home'],['esc','Escalas']];if(isLouvor())tabs.push(['mus','Música']);if(man)tabs.push(['pes','Pessoas']);
@@ -253,6 +257,9 @@ document.addEventListener('click',async ev=>{
     if(a==='rec'){if(!confirm('Recusar este pedido?'))return;const {error}=await sb.from('servo_ministerios').delete().eq('servo_id',d.s).eq('ministerio_id',d.m);if(error)throw error}
     if(a==='add'){const r={evento_id:$('fEv').value,ministerio_id:$('fMin').value,funcao_id:$('fFun').value,servo_id:$('fSer').value};if(!r.funcao_id||!r.servo_id)return toast('Escolha função e servo.');const {error}=await sb.from('escalas').insert(r);if(error)throw error;toast('Servo escalado.')}
     if(a==='del'){const {error}=await sb.from('escalas').delete().eq('id',d.id);if(error)throw error}
+    if(a==='pause'){const p=d.p==='1';const {error}=await sb.from('servo_ministerios').update({pausado:p}).eq('servo_id',d.s).eq('ministerio_id',d.m);if(error)throw error;toast(p?'Servo pausado. Ele não aparece mais para novas escalas.':'Servo retomado.')}
+    if(a==='rm'){if(!confirm(`Excluir ${d.n} do ministério ${S.min[d.m]?.nome}? As escalas dele nesse ministério também serão apagadas.`))return;const {error}=await sb.from('servo_ministerios').delete().eq('servo_id',d.s).eq('ministerio_id',d.m);if(error)throw error;toast('Servo excluído do ministério.')}
+    if(a==='rmall'){if(!confirm(`Excluir ${d.n} da igreja? Isso apaga o cadastro e as escalas em TODOS os ministérios. Não dá para desfazer.`))return;const {error}=await sb.from('servos').delete().eq('id',d.s);if(error)throw error;toast('Cadastro excluído.')}
     if(a==='page'){S.page=d.v;S.menu=false;if(d.v==='aniv'){S.anMes=null;S.anList=S.an}return render()}
     if(a==='back'){S.page='';S.aForm=false;return render()}
     if(a==='perfil'){S.page='perfil';S.menu=false;return render()}
@@ -276,7 +283,7 @@ document.addEventListener('click',async ev=>{
     if(a==='set-up'||a==='set-down'){const {error}=await sb.rpc('mover_setlist',{p_evento:S.mEv,p_ordem:+d.o,p_dir:a==='set-up'?-1:1});if(error)throw error}
     if(a==='set-del'){const {error}=await sb.from('setlist_itens').delete().eq('evento_id',S.mEv).eq('ordem',+d.o);if(error)throw error}
     await refresh();
-  }catch(e){toast(/servos_aniv_valido/.test(e.message)?'Data de aniversário inválida.':/musicas_unica/.test(e.message)?'Essa música, com essa versão, já está cadastrada.':/foreign key/i.test(e.message)?'Essa música está em algum repertório. Remova de lá primeiro.':/duplicate|unique/i.test(e.message)?'Esse item já existe ou o servo já está escalado neste culto.':e.message)}
+  }catch(e){toast(/servo pausado/.test(e.message)?'Esse servo está pausado e não pode ser escalado.':/servos_aniv_valido/.test(e.message)?'Data de aniversário inválida.':/musicas_unica/.test(e.message)?'Essa música, com essa versão, já está cadastrada.':/foreign key/i.test(e.message)?'Essa música está em algum repertório. Remova de lá primeiro.':/duplicate|unique/i.test(e.message)?'Esse item já existe ou o servo já está escalado neste culto.':e.message)}
 });
 document.addEventListener('input',e=>{if(e.target.id==='mQ'){S.q=e.target.value;const x=$('mlib');if(x)x.innerHTML=libHtml()}});
 document.addEventListener('change',e=>{if(e.target.id==='anM'){S.anMes=+e.target.value;loadAn()}if(e.target.id==='mEv'){S.mEv=e.target.value;const x=$('mset');if(x)x.innerHTML=setlistHtml()}});
