@@ -84,6 +84,24 @@ input[type=checkbox]{display:inline-block;width:auto;margin:0 8px 0 0}.chk{displ
 .qk{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}.qk button{border:0;background:var(--field);color:var(--tx);border-radius:999px;padding:8px 14px;font:700 13px inherit;font-family:inherit;cursor:pointer}
 #toast{position:fixed;left:50%;bottom:104px;transform:translateX(-50%);background:#14212B;color:#fff;padding:12px 18px;border-radius:999px;font-size:14px;font-weight:600;max-width:88%;opacity:0;pointer-events:none;transition:.25s;z-index:9;text-align:center}
 #toast.on{opacity:1}
+body{font-size:15px}
+h2{font-size:15px;margin:22px 2px 10px}.hi{margin:10px 2px 2px}.hi h1{font-size:24px}
+.card{border-radius:20px;padding:14px 16px;box-shadow:0 1px 10px rgba(20,45,62,.06)}
+.hero{border-radius:24px;padding:18px;box-shadow:0 10px 26px rgba(15,76,102,.22)}.hero .big{font-size:20px}.hero:after{opacity:.5}
+.btn{padding:12px 18px;font-size:14px;box-shadow:none}.btn.sm{padding:8px 14px;font-size:13px}
+.tag{font-size:10px;padding:3px 9px}.chip{font-size:13px;padding:7px 13px;box-shadow:none}
+.hs{gap:8px}
+.mcard{width:84px;min-height:68px;padding:10px;border-radius:18px;gap:2px;box-shadow:none;justify-content:space-between}.mcard .em{position:static;font-size:17px;line-height:1}.mcard b{font-size:12px}.mcard small{font-size:10px}
+.ecard{width:200px;padding:12px 14px;border-radius:20px;box-shadow:0 1px 10px rgba(20,45,62,.06)}
+.warn{font-size:13px;border-radius:18px;padding:12px 14px}
+.pe .a,.bd{width:36px;height:36px;font-size:12px}
+input,select,textarea{font-size:15px;padding:12px 14px}
+nav button{font-size:10px}nav svg{width:20px;height:20px}
+.mc{display:flex;flex-direction:column;gap:2px}.mc .ti{font-weight:700;font-size:15px;line-height:1.3;overflow-wrap:anywhere}
+.mc .ar{font-size:12px;color:var(--mu)}.mc .tom{font-size:12px;font-weight:800}
+.mc .ac{display:flex;justify-content:flex-end;align-items:center;gap:6px;margin-top:8px}
+.tag.faltou{background:rgba(229,72,77,.15);color:#e5484d}.tag.presente{background:rgba(31,157,107,.16);color:var(--ok)}
+.pal{font-size:11px}.xs{font-size:12px;color:var(--mu);margin-top:4px}
 </style>
 </head>
 <body>
@@ -94,12 +112,12 @@ const SB_URL='https://oouecxkgetmsdwvsnyva.supabase.co',SB_KEY='sb_publishable_j
 const sb=supabase.createClient(SB_URL,SB_KEY);
 const app=document.getElementById('app'),$=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const ST={pendente:'Pendente',confirmado:'Confirmado',troca_solicitada:'Troca pedida',recusado:'Recusado'};
+const ST={pendente:'Pendente',confirmado:'Confirmado',troca_solicitada:'Troca pedida',recusado:'Recusado',presente:'Presente',faltou:'Faltou'};
 const fmt=d=>new Date(d).toLocaleString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Fortaleza'});
 const ini=n=>String(n||'?').trim().split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();
 const LOGO=c=>`<picture><source media="(prefers-color-scheme: dark)" srcset="logo-branco.png"><img class="logo" src="logo-cor.png" alt="Casa Viva Fortaleza"${c||''}></picture>`;
 const IC={home:'<svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>',esc:'<svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3.5"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>',mus:'<svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg>',pes:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><circle cx="17" cy="9" r="2.4"/><path d="M17 14c2.4 0 4 1.7 4 4"/></svg>'};
-let S={tab:'home',mode:'in',me:null,uid:null,vin:[],esc:[],min:{},fun:{},ev:[],menu:false,mus:[],set:[],q:'',mEv:null,mForm:null,page:'',av:[],an:[],anList:[],anMes:null,aForm:false};
+let S={tab:'home',mode:'in',me:null,uid:null,vin:[],esc:[],min:{},fun:{},ev:[],menu:false,mus:[],set:[],q:'',mEv:null,mForm:null,sf:[],hist:[],sem:[],fEdit:null,page:'',av:[],an:[],anList:[],anMes:null,aForm:false};
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),3800)}
 
 async function authView(){
@@ -108,7 +126,7 @@ async function authView(){
   const up=S.mode==='up';
   app.innerHTML=`<div class="auth">${LOGO()}<p class="sub">Escalas de servos</p>
   <div class="seg"><button data-act="mode" data-v="in" class="${up?'':'on'}">Entrar</button><button data-act="mode" data-v="up" class="${up?'on':''}">Cadastrar</button></div>
-  <div class="card">${up?`<label>Nome completo<input id="nome" autocomplete="name"></label><label>WhatsApp<input id="wpp" type="tel" autocomplete="tel"></label><label>Ministério onde serve<select id="min"><option value="">Escolha…</option>${opts}</select></label><label>Aniversário (opcional)<div class="row2"><select id="ad"><option value="">Dia</option>${dias()}</select><select id="am"><option value="">Mês</option>${meses()}</select></div></label>`:''}
+  <div class="card">${up?`<label>Nome completo<input id="nome" autocomplete="name"></label><label>WhatsApp<input id="wpp" type="tel" autocomplete="tel"></label><label>Ministério onde serve<select id="min"><option value="">Escolha…</option>${opts}<option value="nenhum">Ainda não sirvo em um ministério</option></select></label><label>Aniversário (opcional)<div class="row2"><select id="ad"><option value="">Dia</option>${dias()}</select><select id="am"><option value="">Mês</option>${meses()}</select></div></label>`:''}
   <label>E-mail<input id="em" type="email" autocomplete="email"></label>
   <label>Senha<input id="pw" type="password" autocomplete="${up?'new-password':'current-password'}" placeholder="mínimo 6 caracteres"></label>
   <button class="btn" data-act="${up?'signup':'signin'}">${up?'Criar meu cadastro':'Entrar'}</button></div>
@@ -125,7 +143,7 @@ async function signup(){
 }
 async function load(){
   const q=(t,s)=>sb.from(t).select(s);
-  const [me,mins,funs,evs]=await Promise.all([q('servos','id,nome_completo,admin_geral,aniv_dia,aniv_mes').eq('user_id',S.uid).maybeSingle(),q('ministerios','id,nome,ativo_no_app'),q('funcoes','id,nome,ministerio_id'),q('eventos','id,nome,inicio,ceia,paleta').gte('inicio',new Date(Date.now()-864e5).toISOString()).order('inicio')]);
+  const [me,mins,funs,evs]=await Promise.all([q('servos','id,nome_completo,admin_geral,aniv_dia,aniv_mes').eq('user_id',S.uid).maybeSingle(),q('ministerios','id,nome,ativo_no_app'),q('funcoes','id,nome,ministerio_id'),q('eventos','id,nome,inicio,ceia,paleta,ceia_confirmada').gte('inicio',new Date(Date.now()-12096e5).toISOString()).order('inicio')]);
   if(me.error)return toast(me.error.message);
   S.me=me.data;
   if(!S.me){app.innerHTML=`<div class="auth">${LOGO()}<h1 style="margin-top:18px">Cadastro não encontrado</h1><p class="sub">Seu login existe, mas não está ligado a um servo. Fale com o líder do seu ministério ou com a administração.</p><button class="btn" data-act="out">Sair</button></div>`;return}
@@ -134,9 +152,10 @@ async function load(){
   S.ev=evs.data||[];
   await refresh();
 }
+async function loadEv(){const {data}=await sb.from('eventos').select('id,nome,inicio,ceia,paleta,ceia_confirmada').gte('inicio',new Date(Date.now()-12096e5).toISOString()).order('inicio');if(data)S.ev=data}
 async function refresh(){
-  const [v,e,mu,st,av,an]=await Promise.all([sb.from('servo_ministerios').select('servo_id,ministerio_id,lider,aprovado,pausado,servos(nome_completo,whatsapp)'),sb.from('escalas').select('id,evento_id,ministerio_id,funcao_id,servo_id,status'),sb.from('musicas').select('id,titulo,artista,tom,versao,youtube_url,observacao').order('titulo'),sb.from('setlist_itens').select('evento_id,ordem,musica_id,tom'),sb.from('avisos').select('id,titulo,texto,ministerio_id,destaque,expira_em,criado_em').order('criado_em',{ascending:false}),sb.rpc('aniversariantes',{p_mes:mesAtual()})]);
-  S.vin=v.data||[];S.esc=e.data||[];S.mus=mu.data||[];S.set=st.data||[];S.av=av.data||[];S.an=an.data||[];render();
+  const [v,e,mu,st,av,an,sf,hi,se]=await Promise.all([sb.from('servo_ministerios').select('servo_id,ministerio_id,lider,aprovado,pausado,servos(nome_completo,whatsapp)'),sb.from('escalas').select('id,evento_id,ministerio_id,funcao_id,servo_id,status'),sb.from('musicas').select('id,titulo,artista,tom,versao,youtube_url,observacao').order('titulo'),sb.from('setlist_itens').select('evento_id,ordem,musica_id,tom,momento'),sb.from('avisos').select('id,titulo,texto,ministerio_id,destaque,expira_em,criado_em').order('criado_em',{ascending:false}),sb.rpc('aniversariantes',{p_mes:mesAtual()}),sb.from('servo_funcoes').select('servo_id,ministerio_id,funcao_id'),sb.from('escala_historico').select('id,evento_id,ministerio_id,servo_id,servo_nome,tipo,detalhe,criado_em').order('criado_em',{ascending:false}).limit(300),sb.rpc('servos_sem_ministerio')]);
+  S.vin=v.data||[];S.esc=e.data||[];S.mus=mu.data||[];S.set=st.data||[];S.av=av.data||[];S.an=an.data||[];S.sf=sf.data||[];S.hist=hi.data||[];S.sem=se.data||[];render();
 }
 async function loadAn(){const {data}=await sb.rpc('aniversariantes',{p_mes:S.anMes||mesAtual()});S.anList=data||[];render()}
 const mine=()=>S.vin.filter(v=>v.servo_id===S.me.id);
@@ -148,7 +167,8 @@ const mesAtual=()=>+new Date().toLocaleString('en-US',{month:'numeric',timeZone:
 const hoje=()=>new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'});
 const rel=d=>{const n=Math.round((new Date(d)-Date.now())/864e5),w=Math.round(n/7);return n<=0?'hoje':n===1?'amanhã':n<7?`daqui a ${n} dias`:`daqui a ${w} ${w===1?'semana':'semanas'}`};
 const EMO={Louvor:'🎵',Bastidores:'🎛️',Casulo:'🦋',Acolher:'🤝',Movidas:'💃','Viva Café':'☕',Intercessão:'🙏',Palavra:'📖',Homens:'🛡️',Comunicação:'📣',Casais:'💞'};
-const pal=e=>e.paleta?`<span class="pal">👔 Roupa: ${esc(e.paleta)}</span>`:'';
+const pal=e=>e.paleta?`<span class="pal">🎨 Paleta de cores: ${esc(e.paleta)}</span>`:'';
+const diaL=x=>new Date(x).toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'});
 const waUrl=(tel,txt)=>{const n=String(tel||'').replace(/\D/g,'');return `https://wa.me/${n.length<=11?'55'+n:n}?text=${encodeURIComponent(txt)}`};
 const appUrl=()=>location.origin+location.pathname;
 const avAtivos=()=>S.av.filter(a=>!a.expira_em||a.expira_em>=hoje()).sort((a,b)=>(b.destaque-a.destaque)||(new Date(b.criado_em)-new Date(a.criado_em)));
@@ -162,9 +182,10 @@ const anRow=n=>`<div class="card row"><div class="pe"><div class="bd${n.dia===+h
 function pgHome(){
   const pend=mine().filter(v=>!v.aprovado),ok=mine().filter(v=>v.aprovado),list=myEsc(),n=list[0],mm=manMins();
   const mins=S.me.admin_geral?mm:ok.map(v=>S.min[v.ministerio_id]).filter(Boolean);
-  const mc=mins.map((m,i)=>{const lead=mm.some(x=>x.id===m.id);return `<div class="mcard g${i%4}"><span class="em">${EMO[m.nome]||'✨'}</span><b>${esc(m.nome)}</b><small>${lead?S.vin.filter(v=>v.ministerio_id===m.id&&v.aprovado).length+' servos':list.filter(e=>e.ministerio_id===m.id).length+' escalas suas'}</small></div>`}).join('');
-  const av=avAtivos().slice(0,3);
+  const mc=mins.map((m,i)=>{const lead=mm.some(x=>x.id===m.id);return `<div class="mcard g${i%4}"><span class="em">${EMO[m.nome]||'✨'}</span><div><b>${esc(m.nome)}</b><br><small>${lead?S.vin.filter(v=>v.ministerio_id===m.id&&v.aprovado).length+' servos':list.filter(e=>e.ministerio_id===m.id).length+' escalas'}</small></div></div>`}).join('');
+  const av=avAtivos().slice(0,3),sem=!S.me.admin_geral&&mine().length===0;
   return `<div class="hi"><small>Que bom ter você aqui,</small><h1>${esc(S.me.nome_completo.split(' ')[0])}</h1></div>
+  ${sem?'<div class="warn">Seu cadastro foi recebido. Em breve um líder vai vincular você ao ministério certo.</div>':''}
   ${mine().some(v=>v.pausado)?`<div class="warn">Sua participação está pausada em: <b>${mine().filter(v=>v.pausado).map(v=>esc(S.min[v.ministerio_id]?.nome)).join(', ')}</b>. Fale com o líder para voltar.</div>`:''}
   ${pend.length?`<div class="warn">Aguardando aprovação do líder: <b>${pend.map(v=>esc(S.min[v.ministerio_id]?.nome)).join(', ')}</b>.</div>`:''}
   <h2>Próxima escala</h2>${n?hero(n):'<div class="card mu">Você ainda não foi escalado.</div>'}
@@ -172,7 +193,7 @@ function pgHome(){
   ${mc?`<h2>Ministérios</h2><div class="hs">${mc}</div>`:''}
   <div class="sec"><h2>Avisos</h2><button class="link" data-act="page" data-v="avisos">Ver todos</button></div>
   ${av.length?av.map(a=>avCard(a)).join(''):'<div class="card mu">Nenhum aviso por enquanto.</div>'}
-  <div class="sec"><h2>Aniversariantes de ${MES[mesAtual()-1]}</h2><button class="link" data-act="page" data-v="aniv">Ver todos</button></div>
+  <div class="sec"><div><h2 style="margin-bottom:0">Aniversariantes</h2><div class="xs" style="margin:0 2px 10px">${MES[mesAtual()-1]}</div></div><button class="link" data-act="page" data-v="aniv">Ver todos</button></div>
   ${S.an.length?S.an.slice(0,4).map(anRow).join(''):'<div class="card mu">Nenhum aniversariante este mês.</div>'}
   ${S.me.aniv_dia?'':`<div class="card"><b>Quer receber parabéns?</b><p class="mu sm">Informe só dia e mês. Aparece apenas para quem serve com você.</p><div class="row2"><select id="pd"><option value="">Dia</option>${dias()}</select><select id="pm"><option value="">Mês</option>${meses()}</select></div><div class="row2"><button class="btn" data-act="aniv-save">Salvar aniversário</button></div></div>`}`}
 function pgAvisos(){
@@ -187,19 +208,23 @@ function pgPerfil(){
 function pgEsc(){
   const list=myEsc(),mm=manMins();
   let h=`<h2>Minhas escalas</h2>${list.length?list.map(escCard).join(''):'<div class="card mu">Nada por enquanto.</div>'}`;
-  if(mm.length)h+=`<h2>Montar escala</h2><div class="card"><label>Culto<select id="fEv">${S.ev.filter(e=>new Date(e.inicio)>Date.now()).map(e=>`<option value="${e.id}">${esc(e.nome)} · ${fmt(e.inicio)}</option>`).join('')}</select></label><label>Ministério<select id="fMin">${mm.map(m=>`<option value="${m.id}">${esc(m.nome)}</option>`).join('')}</select></label><label>Função<select id="fFun"></select></label><label>Servo<select id="fSer"></select></label><button class="btn" data-act="add">Escalar</button></div><div id="lista"></div>`;
-  if(S.me.admin_geral){const fut=S.ev.filter(e=>new Date(e.inicio)>Date.now()-144e5);h+=`<h2>Roupa do culto</h2><div class="card"><label>Culto<select id="pEv">${fut.map(e=>`<option value="${e.id}">${esc(e.nome)} · ${fmt(e.inicio)}${e.paleta?' · '+esc(e.paleta):''}</option>`).join('')}</select></label><label>Paleta de cores<input id="pTx" maxlength="60" placeholder="Ex.: preto, branco, azul"></label><div class="qk">${['Preto','Branco','Azul','Jeans','Vermelho','Colorido'].map(c=>`<button data-act="pal-q" data-v="${c}">${c}</button>`).join('')}</div><label class="chk"><input id="pDia" type="checkbox" checked>Aplicar aos cultos do mesmo dia</label><button class="btn" data-act="pal-save">Salvar roupa</button></div>`}
+  if(mm.length)h+=`<h2>Montar escala</h2><div class="card"><label>Culto<select id="fEv">${S.ev.filter(e=>new Date(e.inicio)>Date.now()-6048e5).map(e=>`<option value="${e.id}"${e.id===(S.ev.find(x=>new Date(x.inicio)>Date.now()-144e5)||{}).id&&!S.sel?' selected':''}>${esc(e.nome)} · ${fmt(e.inicio)}</option>`).join('')}</select></label><label>Ministério<select id="fMin">${mm.map(m=>`<option value="${m.id}">${esc(m.nome)}</option>`).join('')}</select></label><label>Função<select id="fFun"></select></label><label>Servo<select id="fSer"></select></label><button class="btn" data-act="add">Escalar</button></div><div id="lista"></div>`;
+  if(S.me.admin_geral){const fut=S.ev.filter(e=>new Date(e.inicio)>Date.now()-144e5);h+=`<h2>Paleta de cores</h2><div class="card"><label>Culto<select id="pEv">${fut.map(e=>`<option value="${e.id}">${esc(e.nome)} · ${fmt(e.inicio)}${e.paleta?' · '+esc(e.paleta):''}</option>`).join('')}</select></label><label>Cor ou combinação<input id="pTx" maxlength="60" placeholder="Ex.: preto, branco, azul"></label><div class="qk">${['Preto','Branco','Azul','Jeans','Vermelho','Colorido'].map(c=>`<button data-act="pal-q" data-v="${c}">${c}</button>`).join('')}</div><label class="chk"><input id="pDia" type="checkbox" checked>Aplicar aos cultos do mesmo dia</label><button class="btn" data-act="pal-save">Salvar paleta</button></div>`}
   return h}
 function fillSel(){
   const fe=$('fEv');if(!fe)return;const fm=$('fMin');
   if(S.sel){fe.value=S.sel.e;fm.value=S.sel.m}
+  const drawSer=()=>{const m=fm.value,f=$('fFun').value;
+    const temFn=sid=>S.sf.some(x=>x.servo_id===sid&&x.ministerio_id===m),faz=sid=>S.sf.some(x=>x.servo_id===sid&&x.ministerio_id===m&&x.funcao_id===f);
+    $('fSer').innerHTML=S.vin.filter(v=>v.ministerio_id===m&&v.aprovado&&!v.pausado&&(!f||!temFn(v.servo_id)||faz(v.servo_id))).map(v=>`<option value="${v.servo_id}">${esc(v.servos?.nome_completo)}</option>`).join('')||'<option value="">Nenhum servo disponível para esta função</option>'};
   const draw=()=>{const m=fm.value;S.sel={e:fe.value,m};
     $('fFun').innerHTML=Object.values(S.fun).filter(f=>f.ministerio_id===m).map(f=>`<option value="${f.id}">${esc(f.nome)}</option>`).join('')||'<option value="">Sem funções cadastradas</option>';
-    $('fSer').innerHTML=S.vin.filter(v=>v.ministerio_id===m&&v.aprovado&&!v.pausado).map(v=>`<option value="${v.servo_id}">${esc(v.servos?.nome_completo)}</option>`).join('')||'<option value="">Nenhum servo aprovado</option>';
-    const ev=S.ev.find(x=>x.id===fe.value),mn=S.min[m]?.nome,rows=S.esc.filter(e=>e.evento_id===fe.value&&e.ministerio_id===m);
+    drawSer();$('fFun').onchange=drawSer;
+    const ev=S.ev.find(x=>x.id===fe.value),mn=S.min[m]?.nome,rows=S.esc.filter(e=>e.evento_id===fe.value&&e.ministerio_id===m),ini2=ev&&new Date(ev.inicio)<=Date.now()+432e5;
     const info=e=>{const v=S.vin.find(x=>x.servo_id===e.servo_id&&x.ministerio_id===m);return {n:v?.servos?.nome_completo||'—',t:v?.servos?.whatsapp,f:S.fun[e.funcao_id]?.nome}};
-    const msg=(p,e)=>`Paz, ${p.n.split(' ')[0]}! Você está escalado(a) no ${ev.nome} (${fmt(ev.inicio)}) – ${mn}, função ${p.f}.${ev.paleta?' Roupa: '+ev.paleta+'.':''} Confirme no app: ${appUrl()}`;
-    $('lista').innerHTML='<h2>Escalados neste culto</h2>'+(rows.length?rows.map(e=>{const p=info(e);return `<div class="card row"><div class="pe"><div class="a">${esc(ini(p.n))}</div><span><b class="t">${esc(p.n)}</b><span class="mu sm">${esc(p.f)} · ${ST[e.status]}</span></span></div><div class="acts">${p.t?`<a class="yt" href="${esc(waUrl(p.t,msg(p,e)))}" target="_blank" rel="noopener">Avisar</a>`:'<span class="mu sm">sem WhatsApp</span>'}<button class="ghost" data-act="del" data-id="${e.id}">Remover</button></div></div>`}).join('')+`<a class="btn alt" style="display:block;text-align:center;text-decoration:none" href="${esc('https://wa.me/?text='+encodeURIComponent(`*Escala – ${ev.nome} (${fmt(ev.inicio)}) – ${mn}*\n`+(ev.paleta?`Roupa: ${ev.paleta}\n`:'')+rows.map(e=>{const p=info(e);return `• ${p.n} – ${p.f}`}).join('\n')+`\nConfirme no app: ${appUrl()}`))}" target="_blank" rel="noopener">Compartilhar escala no WhatsApp</a>`:'<div class="card mu">Ninguém escalado ainda.</div>')};
+    const msg=p=>`Paz, ${p.n.split(' ')[0]}! Você está escalado(a) no ${ev.nome} (${fmt(ev.inicio)}) – ${mn}, função ${p.f}.${ev.paleta?' Paleta de cores: '+ev.paleta+'.':''} Confirme no app: ${appUrl()}`;
+    const subs=e=>S.vin.filter(v=>v.ministerio_id===m&&v.aprovado&&!v.pausado&&v.servo_id!==e.servo_id&&!S.esc.some(x=>x.evento_id===e.evento_id&&x.servo_id===v.servo_id));
+    $('lista').innerHTML='<h2>Escalados neste culto</h2>'+(rows.length?rows.map(e=>{const p=info(e);return `<div class="card"><div class="row"><div class="pe"><div class="a">${esc(ini(p.n))}</div><span><b class="t">${esc(p.n)}</b><span class="mu sm">${esc(p.f)}</span></span></div><span class="tag ${e.status}">${ST[e.status]}</span></div><div class="row2" style="flex-wrap:wrap;align-items:center">${p.t?`<a class="yt" href="${esc(waUrl(p.t,msg(p)))}" target="_blank" rel="noopener">Avisar</a>`:'<span class="mu sm">sem WhatsApp</span>'}${ini2?`<button class="btn alt sm" data-act="st" data-id="${e.id}" data-v="presente">Presente</button><button class="btn alt sm" data-act="st" data-id="${e.id}" data-v="faltou">Faltou</button>`:''}<button class="ghost" data-act="del" data-id="${e.id}">Remover</button></div>${e.status==='troca_solicitada'?`<div class="row2" style="align-items:center"><select id="sub-${e.id}" style="margin:0">${subs(e).map(v=>`<option value="${v.servo_id}">${esc(v.servos?.nome_completo)}</option>`).join('')||'<option value="">Ninguém disponível</option>'}</select><button class="btn sm" data-act="sub" data-id="${e.id}">Trocar</button></div>`:''}</div>`}).join('')+`<a class="btn alt" style="display:block;text-align:center;text-decoration:none" href="${esc('https://wa.me/?text='+encodeURIComponent(`*Escala – ${ev.nome} (${fmt(ev.inicio)}) – ${mn}*\n`+(ev.paleta?`Paleta de cores: ${ev.paleta}\n`:'')+rows.map(e=>{const p=info(e);return `• ${p.n} – ${p.f}`}).join('\n')+`\nConfirme no app: ${appUrl()}`))}" target="_blank" rel="noopener">Compartilhar escala no WhatsApp</a>`:'<div class="card mu">Ninguém escalado ainda.</div>')};
   fe.onchange=fm.onchange=draw;draw()}
 const louvorId=()=>Object.values(S.min).find(m=>m.nome==='Louvor')?.id;
 const isLouvor=()=>S.me.admin_geral||mine().some(v=>v.aprovado&&v.ministerio_id===louvorId());
@@ -207,36 +232,57 @@ const canMus=()=>S.me.admin_geral||mine().some(v=>v.lider&&v.aprovado&&v.ministe
 const ytOk=u=>{try{const x=new URL(u);return x.protocol==='https:'&&/^(www\.|m\.)?(youtube\.com|youtu\.be)$/.test(x.hostname)}catch(e){return false}};
 const ytBtn=u=>u?`<a class="yt" href="${esc(u)}" target="_blank" rel="noopener">▶ Ouvir</a>`:'';
 const sub=(m,tom)=>esc([m.artista,(tom||m.tom)&&'Tom '+(tom||m.tom),m.versao].filter(Boolean).join(' · '));
+const songCard=(m,tom,acts,n)=>`<div class="card mc"><div class="ti">${n?n+'. ':''}${esc(m.titulo)}</div>${m.artista||m.versao?`<div class="ar">${esc([m.artista,m.versao].filter(Boolean).join(' · '))}</div>`:''}${(tom||m.tom)?`<div class="tom">Tom ${esc(tom||m.tom)}</div>`:''}${m.observacao?`<div class="ar">${esc(m.observacao)}</div>`:''}<div class="ac">${ytBtn(m.youtube_url)}${acts||''}</div></div>`;
+function ceiaHtml(){
+  const ev=S.ev.find(x=>x.id===S.mEv);if(!ev)return '';const adm=S.me.admin_geral,dia=diaL(ev.inicio);
+  const st=ev.ceia?(ev.ceia_confirmada?'<span class="tag confirmado">Ceia confirmada</span>':'<span class="tag pendente">Ceia a confirmar</span>'):'<span class="tag">Sem ceia neste dia</span>';
+  const bt=adm?(ev.ceia?`${ev.ceia_confirmada?'':`<button class="btn sm" data-act="ceia-ok" data-d="${dia}">Confirmar ceia</button>`}<button class="btn alt sm" data-act="ceia-next" data-d="${dia}">Não vai ter: passar para o próximo domingo</button><button class="ghost" data-act="ceia-off" data-d="${dia}">Remover ceia</button>`:`<button class="btn alt sm" data-act="ceia-ok" data-d="${dia}">Marcar ceia neste domingo</button>`):'';
+  return `<div class="card"><div class="row"><b>Ceia</b>${st}</div>${bt?`<div class="row2" style="flex-wrap:wrap;align-items:center">${bt}</div>`:''}</div>`}
 function setlistHtml(){
-  const items=S.set.filter(i=>i.evento_id===S.mEv).sort((a,b)=>a.ordem-b.ordem),c=canMus();
-  return items.length?items.map((i,k)=>{const m=S.mus.find(x=>x.id===i.musica_id)||{titulo:'(música removida)'};
-    return `<div class="card row"><div class="sg" style="min-width:0"><div class="n">${k+1}</div><div style="min-width:0"><b class="t" style="display:block">${esc(m.titulo)}</b><span class="mu sm">${sub(m,i.tom)}</span></div></div><div class="acts">${ytBtn(m.youtube_url)}${c?`<button class="mini" data-act="set-up" data-o="${i.ordem}" aria-label="Subir">↑</button><button class="mini" data-act="set-down" data-o="${i.ordem}" aria-label="Descer">↓</button><button class="mini" data-act="set-del" data-o="${i.ordem}" aria-label="Remover">✕</button>`:''}</div></div>`}).join(''):'<div class="card mu">Repertório ainda não montado para este culto.</div>'}
+  const ev=S.ev.find(x=>x.id===S.mEv),c=canMus(),items=S.set.filter(i=>i.evento_id===S.mEv);
+  const lou=items.filter(i=>(i.momento||'louvor')==='louvor').sort((a,b)=>a.ordem-b.ordem);
+  const mu=i=>S.mus.find(x=>x.id===i.musica_id)||{titulo:'(música removida)'};
+  const ctl=(i,mov)=>c?`${mov?`<button class="mini" data-act="set-up" data-o="${i.ordem}" aria-label="Subir">↑</button><button class="mini" data-act="set-down" data-o="${i.ordem}" aria-label="Descer">↓</button>`:''}<button class="mini" data-act="set-del" data-o="${i.ordem}" aria-label="Remover">✕</button>`:'';
+  const slot=(mom,tit)=>{const i=items.find(x=>x.momento===mom);return `<h2>${tit}</h2>${i?songCard(mu(i),i.tom,ctl(i,false)):'<div class="card mu sm">Nenhuma música escolhida.</div>'}`};
+  return `<h2>Louvores</h2>${lou.length?lou.map((i,k)=>songCard(mu(i),i.tom,ctl(i,true),k+1)).join(''):'<div class="card mu">Repertório ainda não montado para este culto.</div>'}${slot('generosidade','Louvor da generosidade')}${ev&&ev.ceia?slot('ceia','Louvor da ceia'):''}`}
 function libHtml(){
   const q=(S.q||'').trim().toLowerCase(),c=canMus();
   const l=S.mus.filter(m=>!q||[m.titulo,m.artista,m.versao].join(' ').toLowerCase().includes(q));
-  return l.length?l.map(m=>`<div class="card row"><div style="min-width:0"><b class="t" style="display:block">${esc(m.titulo)}</b><span class="mu sm">${sub(m)}</span>${m.observacao?`<p class="mu sm">${esc(m.observacao)}</p>`:''}</div><div class="acts">${ytBtn(m.youtube_url)}${c?`<button class="mini" data-act="mus-edit" data-id="${m.id}" aria-label="Editar">✎</button>`:''}</div></div>`).join(''):`<div class="card mu">${S.mus.length?'Nenhuma música encontrada.':'Nenhuma música cadastrada ainda.'}</div>`}
+  return l.length?l.map(m=>songCard(m,null,c?`<button class="mini" data-act="mus-edit" data-id="${m.id}" aria-label="Editar">✎</button>`:'')).join(''):`<div class="card mu">${S.mus.length?'Nenhuma música encontrada.':'Nenhuma música cadastrada ainda.'}</div>`}
 function formHtml(){
   const f=S.mForm;if(!f)return '';const v=k=>esc(f[k]||'');
   return `<div class="card"><b>${f.id?'Editar música':'Nova música'}</b><br><br><label>Título<input id="fT" value="${v('titulo')}"></label><label>Artista ou ministério<input id="fA" value="${v('artista')}"></label><label>Tom<input id="fK" value="${v('tom')}" placeholder="Ex.: G"></label><label>Versão<input id="fV" value="${v('versao')}" placeholder="Ex.: original, versão Ana"></label><label>Link do YouTube (versão de referência)<input id="fY" type="url" value="${v('youtube_url')}" placeholder="https://youtu.be/…"></label><label>Observação<textarea id="fO">${v('observacao')}</textarea></label><div class="row2"><button class="btn" data-act="mus-save">Salvar</button><button class="btn alt" data-act="mus-cancel">Cancelar</button></div>${f.id?'<button class="ghost" data-act="mus-del">Excluir música</button>':''}</div>`}
 function pgMus(){
   const c=canMus(),evs=S.ev.filter(e=>new Date(e.inicio)>Date.now()-144e5);
   if(!S.mEv||!evs.some(e=>e.id===S.mEv))S.mEv=evs[0]?.id;
-  let h=`<h2>Repertório do culto</h2><div class="card"><label style="margin:0">Culto<select id="mEv">${evs.map(e=>`<option value="${e.id}"${e.id===S.mEv?' selected':''}>${esc(e.nome)} · ${fmt(e.inicio)}</option>`).join('')}</select></label></div><div id="mset">${setlistHtml()}</div>`;
-  if(c)h+=`<div class="card"><label>Adicionar ao repertório<select id="mSong">${S.mus.map(m=>`<option value="${m.id}">${esc(m.titulo)}${m.versao?' ('+esc(m.versao)+')':''}</option>`).join('')||'<option value="">Cadastre músicas primeiro</option>'}</select></label><label>Tom neste culto (opcional)<input id="mTom" placeholder="Vazio = tom padrão da música"></label><button class="btn" data-act="set-add">Adicionar</button></div>`;
+  const ev=S.ev.find(x=>x.id===S.mEv);
+  let h=`<h2>Repertório</h2><div class="card"><label style="margin:0">Culto<select id="mEv">${evs.map(e=>`<option value="${e.id}"${e.id===S.mEv?' selected':''}>${esc(e.nome)} · ${fmt(e.inicio)}</option>`).join('')}</select></label></div>${ceiaHtml()}<div id="mset">${setlistHtml()}</div>`;
+  if(c)h+=`<div class="card"><label>Adicionar ao repertório<select id="mSong">${S.mus.map(m=>`<option value="${m.id}">${esc(m.titulo)}${m.versao?' ('+esc(m.versao)+')':''}</option>`).join('')||'<option value="">Cadastre músicas primeiro</option>'}</select></label><label>Momento<select id="mMom"><option value="louvor">Louvores</option><option value="generosidade">Louvor da generosidade</option>${ev&&ev.ceia?'<option value="ceia">Louvor da ceia</option>':''}</select></label><label>Tom neste culto (opcional)<input id="mTom" placeholder="Vazio = tom padrão da música"></label><button class="btn" data-act="set-add">Adicionar</button></div>`;
   h+=`<h2>Biblioteca de músicas</h2>${c&&!S.mForm?'<button class="btn alt" style="margin-bottom:12px" data-act="mus-new">+ Nova música</button>':''}${formHtml()}<div class="card" style="padding:6px 8px"><input id="mQ" type="search" placeholder="Buscar por título, artista ou versão" value="${esc(S.q||'')}" style="margin:0"></div><div id="mlib">${libHtml()}</div>`;
   return h}
+const fnsDe=(sid,mid)=>S.sf.filter(x=>x.servo_id===sid&&x.ministerio_id===mid).map(x=>S.fun[x.funcao_id]?.nome).filter(Boolean);
+function pgReg(){
+  const ids=manMins().map(m=>m.id),rows=S.hist.filter(h=>ids.includes(h.ministerio_id));
+  const T={falta:'faltou',presenca:'esteve presente',troca_solicitada:'pediu troca',troca_realizada:'foi substituído(a)'};
+  const nf=rows.filter(h=>h.tipo==='falta').length,nt=rows.filter(h=>h.tipo.startsWith('troca')).length;
+  return `<h2>Faltas e trocas</h2><div class="card row"><span><b>${nf}</b> faltas</span><span><b>${nt}</b> trocas</span></div>${rows.length?rows.map(h=>`<div class="card"><b>${esc(h.servo_nome)}</b> ${T[h.tipo]}<p class="xs">${fmt(h.criado_em)} · ${esc(S.min[h.ministerio_id]?.nome)}${h.detalhe?' · '+esc(h.detalhe):''}</p></div>`).join(''):'<div class="card mu">Nenhum registro ainda.</div>'}`}
 function pgPes(){
-  const ids=manMins().map(m=>m.id),rows=S.vin.filter(v=>ids.includes(v.ministerio_id)&&v.servo_id!==S.me.id);
+  const mm=manMins(),ids=mm.map(m=>m.id),rows=S.vin.filter(v=>ids.includes(v.ministerio_id)&&v.servo_id!==S.me.id);
   const pend=rows.filter(v=>!v.aprovado),ok=rows.filter(v=>v.aprovado);
   const card=(v,p)=>{const n=v.servos?.nome_completo,mn=S.min[v.ministerio_id]?.nome,da=`data-s="${v.servo_id}" data-m="${v.ministerio_id}" data-n="${esc(n)}"`,can=S.me.admin_geral||!v.lider;
-    const acts=p?`<button class="btn sm" data-act="apr" ${da}>Aprovar</button><button class="ghost" data-act="rec" ${da}>Recusar</button>`:can?`<button class="btn alt sm" data-act="pause" ${da} data-p="${v.pausado?0:1}">${v.pausado?'Retomar':'Pausar'}</button><button class="ghost" data-act="rm" ${da}>Excluir</button>${S.me.admin_geral?`<button class="ghost" data-act="rmall" ${da}>Excluir da igreja</button>`:''}`:'';
-    return `<div class="card${v.pausado?' pz':''}"><div class="row"><div class="pe"><div class="a">${esc(ini(n))}</div><span><b class="t">${esc(n)}${v.lider?' · líder':''}</b><span class="mu sm">${esc(mn)}${v.servos?.whatsapp?' · '+esc(v.servos.whatsapp):''}</span></span></div>${v.pausado?'<span class="tag pendente">Pausado</span>':''}</div>${acts?`<div class="row2" style="align-items:center;flex-wrap:wrap">${acts}</div>`:''}</div>`};
-  return `<h2>Pedidos de cadastro (${pend.length})</h2>${pend.length?pend.map(v=>card(v,1)).join(''):'<div class="card mu">Nenhum pedido.</div>'}<h2>Servos (${ok.length})</h2>${ok.length?ok.map(v=>card(v,0)).join(''):'<div class="card mu">Ainda não há servos aprovados.</div>'}`}
+    const nf=S.hist.filter(h=>h.servo_id===v.servo_id&&h.ministerio_id===v.ministerio_id&&h.tipo==='falta').length,nt=S.hist.filter(h=>h.servo_id===v.servo_id&&h.ministerio_id===v.ministerio_id&&h.tipo==='troca_solicitada').length,fn=fnsDe(v.servo_id,v.ministerio_id);
+    const meta=[fn.length?'Funções: '+fn.join(', '):'',nf?`${nf} falta${nf>1?'s':''}`:'',nt?`${nt} troca${nt>1?'s':''}`:''].filter(Boolean).join(' · ');
+    const ed=S.fEdit&&S.fEdit.s===v.servo_id&&S.fEdit.m===v.ministerio_id;
+    const fed=ed?`<div style="margin-top:10px">${Object.values(S.fun).filter(f=>f.ministerio_id===v.ministerio_id).map(f=>`<label class="chk"><input type="checkbox" class="fchk" value="${f.id}"${S.sf.some(x=>x.servo_id===v.servo_id&&x.funcao_id===f.id)?' checked':''}>${esc(f.nome)}</label>`).join('')||'<span class="mu sm">Cadastre funções no ministério primeiro.</span>'}<div class="row2"><button class="btn sm" data-act="fn-save" ${da}>Salvar funções</button><button class="ghost" data-act="fn-cancel">Cancelar</button></div></div>`:'';
+    const acts=p?`<button class="btn sm" data-act="apr" ${da}>Aprovar</button><button class="ghost" data-act="rec" ${da}>Recusar</button>`:can?`<button class="btn alt sm" data-act="fn-open" ${da}>Funções</button><button class="btn alt sm" data-act="pause" ${da} data-p="${v.pausado?0:1}">${v.pausado?'Retomar':'Pausar'}</button><button class="ghost" data-act="rm" ${da}>Excluir</button>${S.me.admin_geral?`<button class="ghost" data-act="rmall" ${da}>Excluir da igreja</button>`:''}`:'';
+    return `<div class="card${v.pausado?' pz':''}"><div class="row"><div class="pe"><div class="a">${esc(ini(n))}</div><span><b class="t">${esc(n)}${v.lider?' · líder':''}</b><span class="mu sm">${esc(mn)}${v.servos?.whatsapp?' · '+esc(v.servos.whatsapp):''}</span></span></div>${v.pausado?'<span class="tag pendente">Pausado</span>':''}</div>${meta?`<div class="xs">${esc(meta)}</div>`:''}${acts?`<div class="row2" style="align-items:center;flex-wrap:wrap">${acts}</div>`:''}${fed}</div>`};
+  const semHtml=S.sem.length?`<h2>Ainda sem ministério (${S.sem.length})</h2>${S.sem.map(x=>`<div class="card"><div class="row"><div class="pe"><div class="a">${esc(ini(x.nome))}</div><span><b class="t">${esc(x.nome)}</b><span class="mu sm">${x.whatsapp?esc(x.whatsapp):'sem WhatsApp'}</span></span></div></div><div class="row2" style="align-items:center"><select id="vm-${x.id}" style="margin:0">${mm.map(m=>`<option value="${m.id}">${esc(m.nome)}</option>`).join('')}</select><button class="btn sm" data-act="link" data-s="${x.id}">Vincular</button></div></div>`).join('')}`:'';
+  return `<button class="btn alt sm" style="margin-top:8px" data-act="page" data-v="registro">Faltas e trocas</button>${semHtml}<h2>Pedidos de cadastro (${pend.length})</h2>${pend.length?pend.map(v=>card(v,1)).join(''):'<div class="card mu">Nenhum pedido.</div>'}<h2>Servos (${ok.length})</h2>${ok.length?ok.map(v=>card(v,0)).join(''):'<div class="card mu">Ainda não há servos aprovados.</div>'}`}
 function render(){
   const mm=manMins(),man=mm.length>0,tabs=[['home','Home'],['esc','Escalas']];if(isLouvor())tabs.push(['mus','Música']);if(man)tabs.push(['pes','Pessoas']);
   const ids=mm.map(m=>m.id),pend=S.vin.filter(v=>!v.aprovado&&v.servo_id!==S.me.id&&ids.includes(v.ministerio_id)).length;
   if(S.tab==='pes'&&!man)S.tab='home';if(S.tab==='mus'&&!isLouvor())S.tab='home';
-  const pg=S.page==='avisos'?pgAvisos():S.page==='aniv'?pgAniv():S.page==='perfil'?pgPerfil():null;
+  const pg=S.page==='avisos'?pgAvisos():S.page==='aniv'?pgAniv():S.page==='perfil'?pgPerfil():S.page==='registro'?pgReg():null;
   const body=pg!==null?`<button class="ghost back" data-act="back">← Voltar</button>${pg}`:S.tab==='esc'?pgEsc():S.tab==='mus'?pgMus():S.tab==='pes'?pgPes():pgHome();
   const role=S.me.admin_geral?'Administração':mine().some(v=>v.lider&&v.aprovado)?'Líder':'Servo';
   app.innerHTML=`<header>${LOGO()}<span class="sp"></span><span class="role">${role}</span><button class="av" data-act="menu" aria-label="Menu">${esc(ini(S.me.nome_completo))}</button>${S.menu?`<div class="menu"><b>${esc(S.me.nome_completo)}</b><button class="btn alt sm" data-act="perfil">Meu aniversário</button><button class="btn alt sm" data-act="out">Sair</button></div>`:''}</header><main>${body}</main><nav>${tabs.map(t=>`<button data-act="tab" data-v="${t[0]}" class="${!S.page&&S.tab===t[0]?'on':''}">${IC[t[0]]}${t[1]}${t[0]==='pes'&&pend?`<i>${pend}</i>`:''}</button>`).join('')}</nav>`;
@@ -270,7 +316,7 @@ document.addEventListener('click',async ev=>{
     if(a==='av-save'){const g=id=>$(id).value.trim(),r={titulo:g('aT'),texto:g('aX')||null,ministerio_id:g('aD')||null,destaque:$('aH').checked,expira_em:g('aE')||null};if(!r.titulo)return toast('Digite o título do aviso.');const {error}=await sb.from('avisos').insert(r);if(error)throw error;S.aForm=false;toast('Aviso publicado.')}
     if(a==='av-del'){if(!confirm('Apagar este aviso?'))return;const {error}=await sb.from('avisos').delete().eq('id',d.id);if(error)throw error}
     if(a==='pal-q'){$('pTx').value=d.v;return}
-    if(a==='pal-save'){const e=S.ev.find(x=>x.id===$('pEv').value);if(!e)return toast('Escolha o culto.');const dia=x=>new Date(x).toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'});const ids=$('pDia').checked?S.ev.filter(x=>dia(x.inicio)===dia(e.inicio)).map(x=>x.id):[e.id];const {error}=await sb.from('eventos').update({paleta:$('pTx').value.trim()||null}).in('id',ids);if(error)throw error;S.ev.forEach(x=>{if(ids.includes(x.id))x.paleta=$('pTx').value.trim()||null});toast('Roupa do culto salva.')}
+    if(a==='pal-save'){const e=S.ev.find(x=>x.id===$('pEv').value);if(!e)return toast('Escolha o culto.');const dia=x=>new Date(x).toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'});const ids=$('pDia').checked?S.ev.filter(x=>dia(x.inicio)===dia(e.inicio)).map(x=>x.id):[e.id];const {error}=await sb.from('eventos').update({paleta:$('pTx').value.trim()||null}).in('id',ids);if(error)throw error;S.ev.forEach(x=>{if(ids.includes(x.id))x.paleta=$('pTx').value.trim()||null});toast('Paleta de cores salva.')}
     if(a==='mus-new'){S.mForm={};return render()}
     if(a==='mus-cancel'){S.mForm=null;return render()}
     if(a==='mus-edit'){S.mForm=S.mus.find(m=>m.id===d.id);return render()}
@@ -279,14 +325,22 @@ document.addEventListener('click',async ev=>{
       if(r.youtube_url&&!ytOk(r.youtube_url))return toast('O link precisa ser do YouTube e começar com https://');
       const id=S.mForm.id,{error}=id?await sb.from('musicas').update(r).eq('id',id):await sb.from('musicas').insert(r);if(error)throw error;S.mForm=null;toast('Música salva.')}
     if(a==='mus-del'){if(!confirm('Excluir esta música?'))return;const {error}=await sb.from('musicas').delete().eq('id',S.mForm.id);if(error)throw error;S.mForm=null;toast('Música excluída.')}
-    if(a==='set-add'){if(!S.mEv)return toast('Não há culto futuro cadastrado.');const mid=$('mSong').value;if(!mid)return toast('Escolha uma música.');const mx=Math.max(0,...S.set.filter(i=>i.evento_id===S.mEv).map(i=>i.ordem));const {error}=await sb.from('setlist_itens').insert({evento_id:S.mEv,ordem:mx+1,musica_id:mid,tom:$('mTom').value.trim()||null});if(error)throw error;toast('Adicionada ao repertório.')}
+    if(a==='set-add'){if(!S.mEv)return toast('Não há culto futuro cadastrado.');const mid=$('mSong').value;if(!mid)return toast('Escolha uma música.');const mom=$('mMom').value,its=S.set.filter(i=>i.evento_id===S.mEv);let ordem;if(mom==='louvor')ordem=Math.max(0,...its.filter(i=>(i.momento||'louvor')==='louvor').map(i=>i.ordem))+1;else{ordem=mom==='ceia'?1001:1000;const ex=its.find(i=>i.momento===mom);if(ex){const {error:e1}=await sb.from('setlist_itens').delete().eq('evento_id',S.mEv).eq('ordem',ex.ordem);if(e1)throw e1}}const {error}=await sb.from('setlist_itens').insert({evento_id:S.mEv,ordem,musica_id:mid,tom:$('mTom').value.trim()||null,momento:mom});if(error)throw error;toast('Adicionada ao repertório.')}
+    if(a==='ceia-ok'||a==='ceia-off'){const {error}=await sb.rpc('definir_ceia',{p_dia:d.d,p_ceia:a==='ceia-ok'});if(error)throw error;await loadEv();toast(a==='ceia-ok'?'Ceia confirmada para este domingo.':'Ceia removida deste domingo.')}
+    if(a==='ceia-next'){if(!confirm('A ceia não vai acontecer neste domingo? Ela passa para o domingo seguinte.'))return;const {data,error}=await sb.rpc('passar_ceia_para_proximo_domingo',{p_dia:d.d});if(error)throw error;await loadEv();toast('Ceia passada para '+new Date(data+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+'.')}
+    if(a==='fn-open'){S.fEdit={s:d.s,m:d.m};return render()}
+    if(a==='fn-cancel'){S.fEdit=null;return render()}
+    if(a==='fn-save'){const ids=[...document.querySelectorAll('.fchk:checked')].map(x=>x.value);const {error}=await sb.rpc('definir_funcoes_servo',{p_servo:d.s,p_ministerio:d.m,p_funcoes:ids});if(error)throw error;S.fEdit=null;toast('Funções salvas.')}
+    if(a==='link'){const m=$('vm-'+d.s).value;if(!m)return toast('Escolha o ministério.');const {error}=await sb.rpc('vincular_servo',{p_servo:d.s,p_ministerio:m});if(error)throw error;toast('Servo vinculado ao ministério.')}
+    if(a==='st'){const {error}=await sb.from('escalas').update({status:d.v}).eq('id',d.id);if(error)throw error;toast(d.v==='faltou'?'Falta registrada.':'Presença registrada.')}
+    if(a==='sub'){const n=$('sub-'+d.id).value;if(!n)return toast('Escolha quem vai substituir.');const {error}=await sb.from('escalas').update({servo_id:n}).eq('id',d.id);if(error)throw error;toast('Troca realizada.')}
     if(a==='set-up'||a==='set-down'){const {error}=await sb.rpc('mover_setlist',{p_evento:S.mEv,p_ordem:+d.o,p_dir:a==='set-up'?-1:1});if(error)throw error}
     if(a==='set-del'){const {error}=await sb.from('setlist_itens').delete().eq('evento_id',S.mEv).eq('ordem',+d.o);if(error)throw error}
     await refresh();
   }catch(e){toast(/servo pausado/.test(e.message)?'Esse servo está pausado e não pode ser escalado.':/servos_aniv_valido/.test(e.message)?'Data de aniversário inválida.':/musicas_unica/.test(e.message)?'Essa música, com essa versão, já está cadastrada.':/foreign key/i.test(e.message)?'Essa música está em algum repertório. Remova de lá primeiro.':/duplicate|unique/i.test(e.message)?'Esse item já existe ou o servo já está escalado neste culto.':e.message)}
 });
 document.addEventListener('input',e=>{if(e.target.id==='mQ'){S.q=e.target.value;const x=$('mlib');if(x)x.innerHTML=libHtml()}});
-document.addEventListener('change',e=>{if(e.target.id==='anM'){S.anMes=+e.target.value;loadAn()}if(e.target.id==='mEv'){S.mEv=e.target.value;const x=$('mset');if(x)x.innerHTML=setlistHtml()}});
+document.addEventListener('change',e=>{if(e.target.id==='anM'){S.anMes=+e.target.value;loadAn()}if(e.target.id==='mEv'){S.mEv=e.target.value;render()}});
 sb.auth.onAuthStateChange((ev,s)=>{
   if(ev==='SIGNED_OUT'){S.uid=null;setTimeout(authView,0)}
   else if(s&&s.user&&S.uid!==s.user.id){S.uid=s.user.id;setTimeout(load,0)}
