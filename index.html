@@ -101,7 +101,7 @@ nav button{font-size:10px}nav svg{width:20px;height:20px}
 .mc .ar{font-size:12px;color:var(--mu)}.mc .tom{font-size:12px;font-weight:800}
 .mc .ac{display:flex;justify-content:flex-end;align-items:center;gap:6px;margin-top:8px}
 .tag.faltou{background:rgba(229,72,77,.15);color:#e5484d}.tag.presente{background:rgba(31,157,107,.16);color:var(--ok)}
-.pal{font-size:11px}.xs{font-size:12px;color:var(--mu);margin-top:4px}
+.err{color:#e5484d}.pal{font-size:11px}.xs{font-size:12px;color:var(--mu);margin-top:4px}
 </style>
 </head>
 <body>
@@ -117,7 +117,7 @@ const fmt=d=>new Date(d).toLocaleString('pt-BR',{weekday:'short',day:'2-digit',m
 const ini=n=>String(n||'?').trim().split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();
 const LOGO=c=>`<picture><source media="(prefers-color-scheme: dark)" srcset="logo-branco.png"><img class="logo" src="logo-cor.png" alt="Casa Viva Fortaleza"${c||''}></picture>`;
 const IC={home:'<svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>',esc:'<svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3.5"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>',mus:'<svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg>',pes:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><circle cx="17" cy="9" r="2.4"/><path d="M17 14c2.4 0 4 1.7 4 4"/></svg>'};
-let S={tab:'home',mode:'in',me:null,uid:null,vin:[],esc:[],min:{},fun:{},ev:[],menu:false,mus:[],set:[],q:'',mEv:null,mForm:null,sf:[],hist:[],sem:[],fEdit:null,page:'',av:[],an:[],anList:[],anMes:null,aForm:false};
+let S={tab:'home',mode:'in',me:null,uid:null,vin:[],esc:[],min:{},fun:{},ev:[],menu:false,mus:[],set:[],q:'',mEv:null,mForm:null,sf:[],hist:[],sem:[],fEdit:null,hl:null,page:'',av:[],an:[],anList:[],anMes:null,aForm:false};
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),3800)}
 
 async function authView(){
@@ -258,7 +258,7 @@ function pgMus(){
   const ev=S.ev.find(x=>x.id===S.mEv);
   let h=`<h2>Repertório</h2><div class="card"><label style="margin:0">Culto<select id="mEv">${evs.map(e=>`<option value="${e.id}"${e.id===S.mEv?' selected':''}>${esc(e.nome)} · ${fmt(e.inicio)}</option>`).join('')}</select></label></div>${ceiaHtml()}<div id="mset">${setlistHtml()}</div>`;
   if(c)h+=`<div class="card"><label>Adicionar ao repertório<select id="mSong">${S.mus.map(m=>`<option value="${m.id}">${esc(m.titulo)}${m.versao?' ('+esc(m.versao)+')':''}</option>`).join('')||'<option value="">Cadastre músicas primeiro</option>'}</select></label><label>Momento<select id="mMom"><option value="louvor">Louvores</option><option value="generosidade">Louvor da generosidade</option>${ev&&ev.ceia?'<option value="ceia">Louvor da ceia</option>':''}</select></label><label>Tom neste culto (opcional)<input id="mTom" placeholder="Vazio = tom padrão da música"></label><button class="btn" data-act="set-add">Adicionar</button></div>`;
-  h+=`<h2>Biblioteca de músicas</h2>${c&&!S.mForm?'<button class="btn alt" style="margin-bottom:12px" data-act="mus-new">+ Nova música</button>':''}${formHtml()}<div class="card" style="padding:6px 8px"><input id="mQ" type="search" placeholder="Buscar por título, artista ou versão" value="${esc(S.q||'')}" style="margin:0"></div><div id="mlib">${libHtml()}</div>`;
+  h+=`<h2>Biblioteca de músicas</h2>${c?`<div class="card"><b>Holyrics</b><p class="xs">Traz título, autor e tom da biblioteca do Holyrics. O Holyrics precisa estar aberto e com internet.</p><div class="row2" style="flex-wrap:wrap"><button class="btn alt sm" data-act="hl-test">Testar conexão</button><button class="btn sm" data-act="hl-imp">Importar músicas</button></div>${S.hl?`<p class="xs${S.hl.err?' err':''}">${esc(S.hl.msg)}</p>`:''}</div>`:''}${c&&!S.mForm?'<button class="btn alt" style="margin-bottom:12px" data-act="mus-new">+ Nova música</button>':''}${formHtml()}<div class="card" style="padding:6px 8px"><input id="mQ" type="search" placeholder="Buscar por título, artista ou versão" value="${esc(S.q||'')}" style="margin:0"></div><div id="mlib">${libHtml()}</div>`;
   return h}
 const fnsDe=(sid,mid)=>S.sf.filter(x=>x.servo_id===sid&&x.ministerio_id===mid).map(x=>S.fun[x.funcao_id]?.nome).filter(Boolean);
 function pgReg(){
@@ -306,6 +306,12 @@ document.addEventListener('click',async ev=>{
     if(a==='pause'){const p=d.p==='1';const {error}=await sb.from('servo_ministerios').update({pausado:p}).eq('servo_id',d.s).eq('ministerio_id',d.m);if(error)throw error;toast(p?'Servo pausado. Ele não aparece mais para novas escalas.':'Servo retomado.')}
     if(a==='rm'){if(!confirm(`Excluir ${d.n} do ministério ${S.min[d.m]?.nome}? As escalas dele nesse ministério também serão apagadas.`))return;const {error}=await sb.from('servo_ministerios').delete().eq('servo_id',d.s).eq('ministerio_id',d.m);if(error)throw error;toast('Servo excluído do ministério.')}
     if(a==='rmall'){if(!confirm(`Excluir ${d.n} da igreja? Isso apaga o cadastro e as escalas em TODOS os ministérios. Não dá para desfazer.`))return;const {error}=await sb.from('servos').delete().eq('id',d.s);if(error)throw error;toast('Cadastro excluído.')}
+    if(a==='hl-test'||a==='hl-imp'){S.hl={msg:'Conectando ao Holyrics…'};render();
+      const {data,error}=await sb.functions.invoke('holyrics-biblioteca',{body:{acao:a==='hl-test'?'testar':'importar'}});
+      let r=data;if(error){try{r=await error.context.json()}catch(e2){r={erro:error.message}}}
+      if(!r||r.erro){S.hl={msg:(r&&r.erro)||'Não consegui conectar ao Holyrics.',err:1};return render()}
+      S.hl={msg:a==='hl-test'?`Conectado! O Holyrics tem ${r.total} músicas.`:`Importação concluída: ${r.novas} novas, ${r.vinculadas} ligadas a músicas que você já tinha, ${r.tomPreenchido} tons preenchidos.`};
+      if(a==='hl-test')return render()}
     if(a==='page'){S.page=d.v;S.menu=false;if(d.v==='aniv'){S.anMes=null;S.anList=S.an}return render()}
     if(a==='back'){S.page='';S.aForm=false;return render()}
     if(a==='perfil'){S.page='perfil';S.menu=false;return render()}
